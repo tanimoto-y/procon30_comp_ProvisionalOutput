@@ -27,13 +27,13 @@ https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8
 #### Windowsの場合
 （準備中）
 
-### プロジェクトを開く方法
+### ビルド方法
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
 Windowsの場合はVisual Studio 2019を使用してください。
 
-### Xcodeで開く場合
+### Xcodeでビルドする場合
 1. `procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/provisional_IO.xcodeproj`をXcodeで開く。
 2. 画面左上の再生ボタンのようなボタンを押す。
 
-### Visual Studioで開く場合
+### Visual Studioでビルドする場合
 （準備中）
