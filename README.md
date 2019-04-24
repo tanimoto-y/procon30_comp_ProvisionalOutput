@@ -11,9 +11,21 @@
 - C++
 - OpenSiv3D v0.3.1
 
-## 実方方法
+## 実行方法 
+OpenSiv3Dのファイルはサイズが大きいため、このリポジトリにはXcodeのプロジェクトファイルのみ置いてあります。  
+このままではビルドできません。Xcodeでビルドして動かすには、OpenSiv3Dのライブラリファイルなどが必要です。  
+（ただし、OpenSiv3Dを導入しなくても`projects/procon30_comp_ProvisionalOutput/bin/`にあるempty.appから実行することはできます）  
+
+### OpenSiv3Dの導入方法
+OpenSiv3Dの導入は簡単で、ファイルをコピーするだけです。  
+
+#### macOSの場合
+1. 以下のサイトから、OpenSiv3D プロジェクトテンプレート（zip形式）をダウンロードします。  
+https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8B%E6%BA%96%E5%82%99_(macOS)
+2. ダウンロードが完了したら、zipファイルを展開し、ローカルリポジトリのフォルダ（procon30_comp_ProvisionalOutputフォルダ）にコピーします。
+
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
-Windowsの場合は、Visual Studio 2019を使用してください。
+Windowsの場合はVisual Studio 2019を使用してください。
 
 ### Xcodeで実行する場合
 1. procon30_comp_provisional_IO/projects/provisional_IO/provisional_IO.xcodeproj をXcodeで開く。
