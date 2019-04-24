@@ -13,8 +13,8 @@
 
 ## 実行方法 
 OpenSiv3Dのファイルはサイズが大きいため、このリポジトリにはXcodeのプロジェクトファイルのみ置いてあります。  
-このままではビルドできません。Xcodeでビルドして動かすには、OpenSiv3Dのライブラリファイルなどが必要です。  
-（ただし、OpenSiv3Dを導入しなくても`projects/ProvisionalOutput/bin/`にあるempty.appから実行することはできます）  
+このままではビルドできません。Xcodeでビルドして動かすには、OpenSiv3Dの導入が必要です。  
+（ただし、OpenSiv3Dを導入しなくても`procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/bin/`にあるempty.appから実行することはできます）  
 
 ### OpenSiv3Dの導入方法
 OpenSiv3Dの導入は簡単で、ファイルをコピーするだけです。  
