@@ -10,13 +10,12 @@
 using namespace std;
 
 class Node {
-    vector<Node*> mChildNodesPtr;
-    Node* mParentNodePtr = nullptr;
-    Node* mTopParentNodePtr = nullptr;
-    Node* mThisNodePtr;
+    vector<Node*> mChildNodesPtr;       // 子ノードのポインタ
+    Node* mParentNodePtr = nullptr;     // 親ノードのポインタ
+    Node* mThisNodePtr;                 // このノードのポインタ
     
-    int mW, mH;
-    int mTreeHigh;
+    int mW, mH;                         // 座標
+    int mTreeHigh;                      // ノードの高さ
     
 public:
     Node(const int argW, const int argH, Node* argParentNodePtr);   // コンストラクタ
@@ -30,3 +29,4 @@ public:
 };
 
 #endif /* node_hpp */
+

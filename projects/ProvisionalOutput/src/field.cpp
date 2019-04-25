@@ -1,6 +1,15 @@
 #include "field.hpp"
 
 // コンストラクタ（初期化も行う）
+/**
+ Field::Field
+ Fieldクラスのコンストラクタ（初期化も行う）。
+ 
+ @param argFieldPointsArray フィールドの得点の配列
+ @param argFieldStatusArray フィールドの状態を示す配列
+ @param position            フィールドの大きさを示す配列（例：{10, 10}）
+ @param argAllyTeamColor    味方チームの色（TeamColor::RED or TeamColor::BLUE）
+ */
 Field::Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray, const Vec2 position, const bool argAllyTeamColor) {
     // フィールドの大きさの設定
     mFieldSizeW = position.x;
@@ -39,7 +48,17 @@ Field::Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector
     mFieldBottommostPoint    = WINDOW_SIZE_H/2+mFieldLineLengthH/2;
 }
 
-// フィールドの設定
+/**
+ Field::setField
+ フィールドの設定を行う。
+ フィールドの得点、状況をプライベート配列にコピーし、エージェントにIDを振り分ける。
+ IDはフィールドの左上から順に振り分けられ、味方のエージェントのIDは1から上がっていき、相手のエージェントのIDは-1から下がっていく。
+ この関数は、基本的にFieldコンストラクタから呼び出される。
+ 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3
+ 
+ @param argFieldPointsArray フィールドの得点の配列
+ @param argFieldStatusArray フィールドの状態を示す配列
+ */
 void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray) {
     mFieldPointsArray = argFieldPointsArray;    // フィールドの得点
     mFieldStatusArray = argFieldStatusArray;    // フィールドの状況
@@ -88,12 +107,23 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     mTotalTeamAgents = allyAgentsCount;
 }
 
-// フィールドの1マスの大きさを返す
+/**
+ Field::getFieldSquareSize:
+ フィールドの1マスの大きさ（mFieldSquareSize）を返す
+ 
+ @return mFieldSquareSize（フィールドの1マスの大きさ）
+ */
 int Field::getFieldSquareSize() {
     return mFieldSquareSize;
 }
 
-// 合計得点を返す
+/**
+ Field::getTotalPoints:
+ 合計得点(mAllyPoints, mEnemyPoints)を返す
+ 
+ @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
+ @return 合計得点
+ */
 int Field::getTotalPoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
         return mAllyPoints;
@@ -103,7 +133,13 @@ int Field::getTotalPoints(const Team::Type argTeam) {
     }
 }
 
-// タイルポイントを返す
+/**
+ Field::getTilePoints:
+ タイルポイント(mAllyTilePoints, mEnemyTilePoints)を返す
+ 
+ @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
+ @return タイルポイント
+ */
 int Field::getTilePoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
         return mAllyTilePoints;
@@ -113,7 +149,13 @@ int Field::getTilePoints(const Team::Type argTeam) {
     }
 }
 
-// 領域ポイントを返す
+/**
+ Field::getAreaPoints:
+ 領域ポイント(mAllyAreaPoints, mEnemyAreaPoints)を返す
+ 
+ @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
+ @return 領域ポイント
+ */
 int Field::getAreaPoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
         return mAllyAreaPoints;
@@ -123,14 +165,27 @@ int Field::getAreaPoints(const Team::Type argTeam) {
     }
 }
 
-// Fieldクラスで使うフォントの設定
+/**
+ Field::setFont:
+ Fieldクラスで使うフォントの設定
+ 
+ @param argPointTextFont¥       普通のフォント
+ @param argPointTextFontBold    太字のフォント
+ @param argAgentIDTextFont      エージェントのIDを表示する時に使うフォント
+ */
 void Field::setFont(const Font argPointTextFont, const Font argPointTextFontBold, const Font argAgentIDTextFont) {
     mPointTextFont = argPointTextFont;
     mPointTextFontBold = argPointTextFontBold;
     mAgentIDTextFont = argAgentIDTextFont;
 }
 
-// マスの上にカーソルがあるか判断
+/**
+ Field::isCursorOnTheSquare
+ マスの上にカーソルがあるか判断
+ 
+ @param argPosition 検知するマスの座標（Vec2型, 例: {0, 0}）
+ @return カーソルがあればtrue, なければfalse
+ */
 bool Field::isCursorOnTheSquare(const Vec2 argPosition) {
     if (Cursor::Pos().x > argPosition.x && Cursor::Pos().y > argPosition.y
         && Cursor::Pos().x < argPosition.x+mFieldSquareSize && Cursor::Pos().y < argPosition.y+mFieldSquareSize) {
@@ -141,8 +196,21 @@ bool Field::isCursorOnTheSquare(const Vec2 argPosition) {
     }
 }
 
-// 領域ポイントが存在するか（=マスを囲めているか）確認（再帰関数）
-// (argStartW, argStartH)を始点とし同じチームのタイルをたどる
+/**
+ Field::searchAreaPointsSide:
+ *再帰関数
+ フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定する
+ 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定する
+ その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定する
+ 領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する
+ 
+ @param argFieldMark    フィールドの領域に認定したかどうか（一時的な配列）
+ @param argStartW       領域探索の始点のマスのx座標
+ @param argStartH       領域探索の始点のマスのy座標
+ @param argW            現在探索中のマスのx座標
+ @param argH            現在探索中のマスのy座標
+ @param argParentNode   親ノード(Nodeクラス)のポインタ
+ */
 void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int argStartW, const int argStartH, const int argW, const int argH, Node* argParentNode) {
     int w, h;
     int nodes = 0;
@@ -169,7 +237,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         if (gMoveDirections[i].x == 0 && gMoveDirections[i].y == 0) {
             continue;
         }
-            
+        
         // 対象となるマスをずらす
         // フィールドから出たらcontinue
         if (w+gMoveDirections[i].x < 0 || h+gMoveDirections[i].y < 0 || w+gMoveDirections[i].x > mFieldSizeW-1 || h+gMoveDirections[i].y > mFieldSizeH-1) {
@@ -207,9 +275,9 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                 if (parentNode->getParentNode() == nullptr) {
                     break;
                 }
-                    
+                
                 parentNode = parentNode->getParentNode();
-                    
+                
                 if (parentNode->getPosition().x == w && parentNode->getPosition().y == h) {
                     if ((w == argStartW && h == argStartH && !argFieldMark[argStartH][argStartW]) ||
                         (w != argStartW && h != argStartH)) {
@@ -302,9 +370,9 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                         // 条件: 自チームのタイルがなく、自チームの領域にも含まれていない
                         if (mFieldStatusArray[lineH][lineW] != team &&
                             ((team == TileStatus::ALLY && !mFieldAllyAreaSquaresArray[lineH][lineW]) ||
-                            (team == TileStatus::ENEMY && !mFieldEnemyAreaSquaresArray[lineH][lineW]))) {
-                            whiteTiles ++;
-                        }
+                             (team == TileStatus::ENEMY && !mFieldEnemyAreaSquaresArray[lineH][lineW]))) {
+                                whiteTiles ++;
+                            }
                         
                         // 目的のマスにたどり着いたときの処理
                         if (lineW == w && lineH == h) {
@@ -335,7 +403,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                         
                                         // 仮の領域への指定を反映
                                         mFieldAllyAreaSquaresArray = areaSquares;
-
+                                        
                                     }
                                     else {
                                         mEnemyAreaPoints = 0;
@@ -343,7 +411,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                         
                                         // 仮の領域への指定を反映
                                         mFieldEnemyAreaSquaresArray = areaSquares;
-
+                                        
                                     }
                                     
                                     for (int j = 0; j < mFieldSizeH; j++) {
@@ -395,7 +463,25 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
     }
 }
 
-// 領域内のマスの探索
+/**
+ searchAreaPointsSquares:
+ *再帰関数
+ 領域と仮定したマスの探索
+ Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する
+ あるいは領域を成すタイルが相手に除去された時に、その後も領域が成立するかどうか確認する
+ 走査線は4方向に移動しながら調査する
+ 走査線が同じチームのタイルにあぶつかるまで探索を続け、
+ 同じチームのタイルにぶつかることなくフィールドの外に走査線が出たら、領域が成立しないと判断する
+ フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める
+ 領域が成立するならtrue, 成立しないならfalseを返す
+ 
+ @param argAreaSquares 領域にマスが含まれているかどうかを示す一時的な配列
+ @param argStartW 領域探索の始点のマスのx座標
+ @param argStartH 領域探索の始点のマスのy座標
+ @param argBeTileStatus タイルをどちらのちチームの領域にしたいか（TileStatus::ALLY or TileStatus::ENEMY）
+ @param argDeleteArea 領域を解除したいときはtrue, 領域を設定したいときはfalse
+ @return 領域が成立すればtrue, しないならfalse（領域の解除に成功した場合もfalse）
+ */
 bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const int argStartW, const int argStartH, const int argBeTileStatus, const bool argDeleteArea) {
     int w, h;
     bool possible = true;
@@ -471,7 +557,16 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
     return true;
 }
 
-// 領域の探索
+
+/**
+ Field::searchAreaPoints:
+ 領域が存在するか確認する
+ この関数は、再帰関数であるsearchAreaPointsSideの呼び出し用の関数で、
+ この関数自体は領域の探索を行わない
+ 
+ @param argStartW 領域探索の始点のマスのx座標
+ @param argStartH 領域探索の始点のマスのy座標
+ */
 void Field::searchAreaPoints(const int argStartW, const int argStartH) {
     //cout << "-----------------------(" << argStartW << ',' << argStartH << ")-----------------------" << endl;
     vector<vector<bool>> fieldMark(mFieldSizeH, vector<bool>(mFieldSizeW, false));
@@ -479,6 +574,15 @@ void Field::searchAreaPoints(const int argStartW, const int argStartH) {
 }
 
 // マスの塗りつぶし
+/**
+ Field::fillSquare:
+ マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
+ 
+ @param argSquarePosition   マスの描画位置 Vec2型
+ @param argW                マスのx座標
+ @param argH                マスのy座標
+ @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
+ */
 void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor) {
     Color agentIDRectColor = Palette::White;
     
@@ -520,7 +624,14 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int a
     }
 }
 
-// 領域の塗りつぶし
+/**
+ Field::fillAreaSquare:
+ 領域マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
+ 
+ @param argSquarePosition   マスの描画位置 Vec2型
+ @param argW                マスのx座標
+ @param argH                マスのy座標
+ */
 void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const int argH) {
     Color rectColor;
     
@@ -555,7 +666,15 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const i
     }
 }
 
-// タイル点数の表示
+/**
+ Field::printSquarePoint:
+ タイル点数の表示
+ 
+ @param argSquarePosition   表示するマスの描画位置 Vec2型
+ @param argW                表示するマスのx座標
+ @param argH                表示するマスのy座標
+ @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
+ */
 void Field::printSquarePoint(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor) {
     unsigned long int textLength = to_string(mFieldPointsArray[argH][argW]).length();
     
@@ -574,7 +693,17 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argW, const
     }
 }
 
-// エージェントの行動
+/**
+ Field::agenrMovement:
+ エージェントの行動
+ エージェントの移動、タイルの除去などを行う
+ 相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる
+ 
+ @param argW        エージェントの移動先のマスのx座標
+ @param argH        エージェントの移動先のマスのy座標
+ @param argBeforeW  エージェントの移動前のマスのx座標
+ @param argBeforeH  エージェントの移動前のマスのy座標
+ */
 void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
     int team = mFieldStatusArray[argBeforeH][argBeforeW];
     
@@ -732,7 +861,13 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
     mEnemyPoints = mEnemyTilePoints + mEnemyAreaPoints;
 }
 
-// 選択するエージェントの変更処理
+/**
+ Field::setCurrentAgent:
+ 選択するエージェントの変更処理
+ 
+ @param argW カーソルで選択されたx座標
+ @param argH カーソルで選択されたy座標
+ */
 void Field::setCurrentAgent(int argW, int argH) {
     // 新しくエージェントを選択するとき
     if (mFieldAgentsIDArray[argH][argW] != 0) {
@@ -747,7 +882,10 @@ void Field::setCurrentAgent(int argW, int argH) {
     }
 }
 
-// フィールドの縦線・横線の描画
+/**
+ Field::drawSquares:
+ フィールドの縦線・横線の描画
+ */
 void Field::drawSquares() {
     for (int w = 0; w < mFieldSizeW; w++) {
         Line(w*mFieldSquareSize+mFieldLeftmostPoint, mFieldTopmostPoint,
@@ -759,7 +897,10 @@ void Field::drawSquares() {
     }
 }
 
-// フィールドの描画
+/**
+ Field::draw:
+ フィールドの描画
+ */
 void Field::draw() {
     Color rectColor;
     
@@ -836,3 +977,4 @@ void Field::draw() {
     
     return;
 }
+
