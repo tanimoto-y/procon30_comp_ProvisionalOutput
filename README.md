@@ -72,49 +72,49 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 
 ### Fieldクラス
 #### プライベート変数・配列
-- vector<vector<int>> mFieldPointsArray;              : フィールドの点数（setFieldで代入）  
-- vector<vector<int>> mFieldStatusArray;              : フィールドの状況（setFieldで代入）  
-- vector<vector<int>> mFieldAgentsIDArray;            : フィールド上のエージェントの場所とエージェントID（setFieldで設定）  
-- vector<vector<bool>> mFieldAllyAreaSquaresArray;    : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector<bool>> mFieldEnemyAreaSquaresArray;   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector<bool>> mFieldAreaSideLinesArray;      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
+- vector<vector¥<int¥>> mFieldPointsArray;              : フィールドの点数（setFieldで代入）  
+- vector<vector¥<int¥>> mFieldStatusArray;              : フィールドの状況（setFieldで代入）  
+- vector<vector¥<int¥>> mFieldAgentsIDArray;            : フィールド上のエージェントの場所とエージェントID（setFieldで設定）  
+- vector<vector¥<bool¥>> mFieldAllyAreaSquaresArray;    : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector<vector¥<bool¥>> mFieldEnemyAreaSquaresArray;   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector<vector¥<bool¥>> mFieldAreaSideLinesArray;      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
   
-- int mAllyPoints  = 0;                           : 味方チームの合計得点（タイルポイント＋領域ポイント）  
-- int mEnemyPoints = 0;                           : 相手チームの合計得点（タイルポイント＋領域ポイント）  
-- int mAllyTilePoints  = 0;                       : 味方チームのタイルポイント  
-- int mEnemyTilePoints = 0;                       : 相手チームのタイルポイント  
-- int mAllyAreaPoints  = 0;                       : 相手チームの領域ポイント
-- int mEnemyAreaPoints = 0;                       : 相手チームの領域ポイント
+- int mAllyPoints                                 : 味方チームの合計得点（タイルポイント＋領域ポイント）  
+- int mEnemyPoints                                : 相手チームの合計得点（タイルポイント＋領域ポイント）  
+- int mAllyTilePoints                             : 味方チームのタイルポイント  
+- int mEnemyTilePoints                            : 相手チームのタイルポイント  
+- int mAllyAreaPoints                             : 相手チームの領域ポイント
+- int mEnemyAreaPoints                            : 相手チームの領域ポイント
   
-- int mFieldSizeW, mFieldSizeH;                   : フィールドの大きさ（wは横、hは縦）  
-- int mFieldLineLengthW, mFieldLineLengthH;       : フィールドの枠の長さ  
-- int mFieldSquareSize;                           : フィールドの1マスあたりの大きさ（正方形）  
+- int mFieldSizeW, mFieldSizeH                    : フィールドの大きさ（wは横、hは縦）  
+- int mFieldLineLengthW, mFieldLineLengthH        : フィールドの枠の長さ  
+- int mFieldSquareSize                            : フィールドの1マスあたりの大きさ（正方形）  
   
-- int mTotalTeamAgents;                           : 各チームのエージェントの総数  
+- int mTotalTeamAgents                            : 各チームのエージェントの総数  
   
-- int mFieldLeftmostPoint;                        : フィールドの描画範囲の左端の座標  
-- int mFieldRightmostPoint;                       : フィールドの描画範囲の右端の座標  
-- int mFieldTopmostPoint;                         : フィールドの描画範囲の上端の座標  
-- int mFieldBottommostPoint;                      : フィールドの描画範囲の下端の座標  
+- int mFieldLeftmostPoint                         : フィールドの描画範囲の左端の座標  
+- int mFieldRightmostPoint                        : フィールドの描画範囲の右端の座標  
+- int mFieldTopmostPoint                          : フィールドの描画範囲の上端の座標  
+- int mFieldBottommostPoint                       : フィールドの描画範囲の下端の座標  
   
-- bool mAllyTeamColor;                            : 味方チームの色（敵チームの色は!allyTeamColorで取得できる）  
+- bool mAllyTeamColor                             : 味方チームの色（敵チームの色は!allyTeamColorで取得できる）  
   
-- Vec2 mCurrentSquarePosition = { -1, -1 };       : 選択されているマスの座標（選択されていなければ(-1, -1)）  
-- int mCurrentAgentID = 0;                        : 選択されているマスにいるエージェントのID（選択されていなければ 0）  
+- Vec2 mCurrentSquarePosition                     : 選択されているマスの座標（選択されていなければ(-1, -1)）  
+- int mCurrentAgentID                             : 選択されているマスにいるエージェントのID（選択されていなければ 0）  
   
-- bool mMousePressing = false;                    : マウスが押されている間はtrue  
+- bool mMousePressing                             : マウスが押されている間はtrue  
   
-- Font mPointTextFont;                            : 点数表示用のフォント  
-- Font mPointTextFontBold;                        : 点数表示用の太字フォント  
-- Font mAgentIDTextFont;                          : エージェントID表示用のフォント  
+- Font mPointTextFont                             : 点数表示用のフォント  
+- Font mPointTextFontBold                         : 点数表示用の太字フォント  
+- Font mAgentIDTextFont                           : エージェントID表示用のフォント  
   
-- int mBigPointsBorder;                           : 大きい点数の基準（この値を超えると太字で点数を表示する）
+- int mBigPointsBorder                            : 大きい点数の基準（この値を超えると太字で点数を表示する）
     
 #### Field::sField
 Fieldクラスのコンストラクタです。フィールドの初期化を行います。
   
-- const vector<vector<int>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector<int>> &argFieldStatusArray    : フィールドの状態を示す配列  
+- const vector<vector¥<int¥>> &argFieldPointsArray    : フィールドの得点の配列  
+- const vector<vector¥<int¥>> &argFieldStatusArray    : フィールドの状態を示す配列  
 - const Vec2 position                               : フィールドの大きさを示す配列（例：{10, 10}）  
 - const bool argAllyTeamColor                       : 味方チームの色（TeamColor::RED or TeamColor::BLUE）
     
@@ -124,8 +124,8 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 この関数は、基本的にFieldコンストラクタから呼び出されます。  
 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3  
   
-- const vector<vector<int>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector<int>> &argFieldStatusArray    : フィールドの状態を示す配列
+- const vector<vector¥<int¥>> &argFieldPointsArray    : フィールドの得点の配列  
+- const vector<vector¥<int¥>> &argFieldStatusArray    : フィールドの状態を示す配列
     
 #### void Field::searchAreaPointsSide
 再帰関数です。  
