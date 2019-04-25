@@ -46,7 +46,7 @@ Windowsの場合はVisual Studio 2019を使用してください。
 
 #### centerText
 指定した座標の中央に文字を表示します。文字列用と数値用があります。
-  
+
 | const String argStr       | 表示する文字列（文字列用）|
 | const int argInt          | 表示する数値（数値用）   |
 | const int argLeftTopX     | 左上のx座標            |
@@ -72,6 +72,7 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 
 ### Fieldクラス
 #### プライベート変数・配列
+
 | vector<vector¥<int¥>> mFieldPointsArray             | フィールドの点数（setFieldで代入）|
 | vector<vector¥<int¥>> mFieldStatusArray             | フィールドの状況（setFieldで代入）| 
 | vector<vector¥<int¥>> mFieldAgentsIDArray           | フィールド上のエージェントの場所とエージェントID（setFieldで設定）|
@@ -112,7 +113,7 @@ Main関数です。ここからそれぞれの関数を呼び出します。
     
 #### Field::sField
 Fieldクラスのコンストラクタです。フィールドの初期化を行います。
-  
+
 | const vector<vector¥<int¥>> &argFieldPointsArray    | フィールドの得点の配列|
 | const vector<vector¥<int¥>> &argFieldStatusArray    | フィールドの状態を示す配列|
 | const Vec2 position                               | フィールドの大きさを示す配列（例：{10, 10}）|
@@ -123,7 +124,7 @@ Fieldクラスのコンストラクタです。フィールドの初期化を行
 IDはフィールドの左上から順に振り分けられ、味方のエージェントのIDは1から上がっていき、相手のエージェントのIDは-1から下がっていきます。  
 この関数は、基本的にFieldコンストラクタから呼び出されます。  
 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3  
-  
+
 | const vector<vector¥<int¥>> &argFieldPointsArray    | フィールドの得点の配列|
 | const vector<vector¥<int¥>> &argFieldStatusArray    | フィールドの状態を示す配列|
     
@@ -132,7 +133,7 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定します。  
 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定します。  
 その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定します。  
-  
+
 | vector<vector¥<bool¥>> argFieldMark     | フィールドの領域に認定したかどうか（一時的な配列）|
 | const int argStartW                   | 領域探索の始点のマスのx座標|
 | const int argStartH                   | 領域探索の始点のマスのy座標|
