@@ -31,12 +31,48 @@ https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
 Windowsの場合はVisual Studio 2019を使用してください。
 
-### Xcodeでビルドする場合
-1. `procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/provisional_IO.xcodeproj`をXcodeで開く。
+#### Xcodeでビルドする場合
+1. `procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/ProvisionalOutput.xcodeproj`をXcodeで開く。
 2. 画面左上の再生ボタンのようなボタンを押す。
 
-### Visual Studioでビルドする場合
+#### Visual Studioでビルドする場合
 （準備中）
 
 ## 各変数・関数の説明
-すみません、もうちょっと待ってください。
+ここでは、よく使う変数や関数の説明を書きます。  
+
+### Main.cpp
+#### centerText
+##### 概要
+指定した座標の中央に文字を表示します。文字列用と数値用があります。
+
+##### 引数
+- const String argStr       : 表示する文字列（文字列用）  
+- const int argInt          : 表示する数値（数値用）  
+- const int argLeftTopX     : 左上のx座標  
+- const int argLeftTopY     : 左上のy座標  
+- const int argRightBottomX : 右下のx座標  
+- const int argRightBottomX : 右下のy座標  
+- const Font& argFont       : 表示に使うフォントのポインタ
+- const Color argColor      : 文字の色
+
+#### printTotalPoints
+##### 概要
+点数を表示します。
+
+##### 引数
+- const Team::Type argTeam            : どちらのチームを表示するか（Team::ALLY or Team::ENEMY）  
+- const bool argTeamColor             : チームの色（TeamColor::RED or TeamColor::BLUE）  
+- Field& argFieldData                 : フィールドクラスのポインタ  
+- const Font& argFont16               : サイズ16のフォントのポインタ  
+- const Font& argFont16Bold           : サイズ16の太字フォントのポインタ
+- const Font& argFont28               : サイズ28のフォントのポインタ
+- const Font& argTotalPointsTextFont  : サイズ28の太字フォントのポインタ
+
+#### Main
+##### 概要
+- const Font& argFont28const Font& argTotalPointsTextFont
+Main関数です。ここからそれぞれの関数を呼び出します。
+
+#### 引数
+なし
