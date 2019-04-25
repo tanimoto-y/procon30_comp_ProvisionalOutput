@@ -190,7 +190,6 @@ void printTotalPoints(const Team::Type argTeam, const bool argTeamColor, Field& 
     }
 }
 
-// Main関数
 /**
  Main関数
  */

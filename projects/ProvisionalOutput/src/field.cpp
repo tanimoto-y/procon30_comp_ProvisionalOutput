@@ -109,7 +109,7 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
 
 /**
  Field::getFieldSquareSize:
- フィールドの1マスの大きさ（mFieldSquareSize）を返す
+ フィールドの1マスの大きさ（mFieldSquareSize）を返す。
  
  @return mFieldSquareSize（フィールドの1マスの大きさ）
  */
@@ -119,7 +119,7 @@ int Field::getFieldSquareSize() {
 
 /**
  Field::getTotalPoints:
- 合計得点(mAllyPoints, mEnemyPoints)を返す
+ 合計得点(mAllyPoints, mEnemyPoints)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 合計得点
@@ -135,7 +135,7 @@ int Field::getTotalPoints(const Team::Type argTeam) {
 
 /**
  Field::getTilePoints:
- タイルポイント(mAllyTilePoints, mEnemyTilePoints)を返す
+ タイルポイント(mAllyTilePoints, mEnemyTilePoints)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return タイルポイント
@@ -151,7 +151,7 @@ int Field::getTilePoints(const Team::Type argTeam) {
 
 /**
  Field::getAreaPoints:
- 領域ポイント(mAllyAreaPoints, mEnemyAreaPoints)を返す
+ 領域ポイント(mAllyAreaPoints, mEnemyAreaPoints)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 領域ポイント
@@ -199,10 +199,10 @@ bool Field::isCursorOnTheSquare(const Vec2 argPosition) {
 /**
  Field::searchAreaPointsSide:
  *再帰関数
- フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定する
- 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定する
- その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定する
- 領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する
+ フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定する。
+ 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定する。
+ その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定する。
+ 領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する。
  
  @param argFieldMark    フィールドの領域に認定したかどうか（一時的な配列）
  @param argStartW       領域探索の始点のマスのx座標
@@ -467,13 +467,13 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
  searchAreaPointsSquares:
  *再帰関数
  領域と仮定したマスの探索
- Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する
- あるいは領域を成すタイルが相手に除去された時に、その後も領域が成立するかどうか確認する
- 走査線は4方向に移動しながら調査する
- 走査線が同じチームのタイルにあぶつかるまで探索を続け、
- 同じチームのタイルにぶつかることなくフィールドの外に走査線が出たら、領域が成立しないと判断する
- フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める
- 領域が成立するならtrue, 成立しないならfalseを返す
+ Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する。
+ あるいは領域を成すタイルが相手に除去された時に、その後も領域が成立するかどうか確認する。
+ 走査線は4方向に移動しながら調査する。
+ 走査線が同じチームのタイルにぶつかるまで探索を続け、
+ 同じチームのタイルにぶつかることなくフィールドの外に走査線が出たら、領域が成立しないと判断する。
+ フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める。
+ 領域が成立するならtrue, 成立しないならfalseを返す。
  
  @param argAreaSquares 領域にマスが含まれているかどうかを示す一時的な配列
  @param argStartW 領域探索の始点のマスのx座標
@@ -560,9 +560,9 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
 
 /**
  Field::searchAreaPoints:
- 領域が存在するか確認する
+ 領域が存在するか確認する。
  この関数は、再帰関数であるsearchAreaPointsSideの呼び出し用の関数で、
- この関数自体は領域の探索を行わない
+ この関数自体は領域の探索を行わない。
  
  @param argStartW 領域探索の始点のマスのx座標
  @param argStartH 領域探索の始点のマスのy座標
@@ -573,7 +573,6 @@ void Field::searchAreaPoints(const int argStartW, const int argStartH) {
     searchAreaPointsSide(fieldMark, argStartW, argStartH, argStartW, argStartH, nullptr);
 }
 
-// マスの塗りつぶし
 /**
  Field::fillSquare:
  マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
@@ -696,8 +695,8 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argW, const
 /**
  Field::agenrMovement:
  エージェントの行動
- エージェントの移動、タイルの除去などを行う
- 相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる
+ エージェントの移動、タイルの除去などを行う。
+ 相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
  
  @param argW        エージェントの移動先のマスのx座標
  @param argH        エージェントの移動先のマスのy座標
