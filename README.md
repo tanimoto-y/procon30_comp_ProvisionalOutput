@@ -77,12 +77,12 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 
 ### Fieldクラス
 #### プライベート変数・配列
-- vector<vector¥<int¥>> mFieldPointsArray;              : フィールドの点数（setFieldで代入）  
-- vector<vector¥<int¥>> mFieldStatusArray;              : フィールドの状況（setFieldで代入）  
-- vector<vector¥<int¥>> mFieldAgentsIDArray;            : フィールド上のエージェントの場所とエージェントID（setFieldで設定）  
-- vector<vector¥<bool¥>> mFieldAllyAreaSquaresArray;    : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector¥<bool¥>> mFieldEnemyAreaSquaresArray;   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector¥<bool¥>> mFieldAreaSideLinesArray;      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
+- vector<vector<<int>>> mFieldPointsArray;              : フィールドの点数（setFieldで代入）  
+- vector<vector<<int>>> mFieldStatusArray;              : フィールドの状況（setFieldで代入）  
+- vector<vector<<int>>> mFieldAgentsIDArray;            : フィールド上のエージェントの場所とエージェントID（setFieldで設定）  
+- vector<vector<<bool>>> mFieldAllyAreaSquaresArray;    : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector<vector<<bool>>> mFieldEnemyAreaSquaresArray;   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector<vector<<bool>>> mFieldAreaSideLinesArray;      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
   
 - int mAllyPoints                                 : 味方チームの合計得点（タイルポイント＋領域ポイント）  
 - int mEnemyPoints                                : 相手チームの合計得点（タイルポイント＋領域ポイント）  
@@ -118,9 +118,9 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 #### Field::Field
 Fieldクラスのコンストラクタです。フィールドの初期化を行います。
   
-- const vector<vector¥<int¥>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector¥<int¥>> &argFieldStatusArray    : フィールドの状態を示す配列  
-- const Vec2 position                               : フィールドの大きさを示す配列（例：{10, 10}）  
+- const vector<vector<<int>>> &argFieldPointsArray    : フィールドの得点の配列  
+- const vector<vector<<int>>> &argFieldStatusArray    : フィールドの状態を示す配列  
+- const Vec2 position                               : フィールドの大きさを示す配列（例：Vec2{10, 10}）  
 - const bool argAllyTeamColor                       : 味方チームの色（TeamColor::RED or TeamColor::BLUE）
     
 #### void Field::setField
@@ -129,8 +129,8 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 この関数は、基本的にFieldコンストラクタから呼び出されます。  
 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3  
   
-- const vector<vector¥<int¥>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector¥<int¥>> &argFieldStatusArray    : フィールドの状態を示す配列
+- const vector<vector<<int>>> &argFieldPointsArray    : フィールドの得点の配列  
+- const vector<vector<<int>>> &argFieldStatusArray    : フィールドの状態を示す配列
     
 #### void Field::searchAreaPointsSide
 再帰関数です。  
@@ -139,8 +139,8 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定します。  
   
 - vector<vector<bool>> argFieldMark     : フィールドの領域に認定したかどうか（一時的な配列）  
-- const int argStartW                   : 領域探索の始点のマスのx座標  
-- const int argStartH                   : 領域探索の始点のマスのy座標  
-- const int argW                        : 現在探索中のマスのx座標  
-- const int argH                        : 現在探索中のマスのy座標  
+- const int argStartX                   : 領域探索の始点のマスのx座標  
+- const int argStartY                   : 領域探索の始点のマスのy座標  
+- const int argX                        : 現在探索中のマスのx座標  
+- const int argY                        : 現在探索中のマスのy座標  
 - Node* argParentNode                   : 親ノードのポインタ  

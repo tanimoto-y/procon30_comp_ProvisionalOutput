@@ -66,33 +66,33 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     int maxPoint = -16, minPoint = 16;
     int allyAgentsCount = 0, enemyAgentsCount = 0;
     
-    for (int h = 0; h < mFieldSizeH; h++) {
+    for (int y = 0; y < mFieldSizeH; y++) {
         mFieldAgentsIDArray.push_back(vector<int>(mFieldSizeW, 0));
         
         mFieldAllyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
         mFieldEnemyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
         
         mFieldAreaSideLinesArray.push_back(vector<bool>(mFieldSizeW, false));
-        for (int w = 0; w < mFieldSizeW; w++) {
-            if (mFieldStatusArray[h][w] == 1) {
+        for (int x = 0; x < mFieldSizeW; x++) {
+            if (mFieldStatusArray[y][x] == 1) {
                 allyAgentsCount ++;
-                mFieldAgentsIDArray[h][w] = allyAgentsCount;    // エージェントにIDを振り分ける
+                mFieldAgentsIDArray[y][x] = allyAgentsCount;    // エージェントにIDを振り分ける
                 
-                mAllyTilePoints += mFieldPointsArray[h][w];     // 初期段階の合計得点の算出
+                mAllyTilePoints += mFieldPointsArray[y][x];     // 初期段階の合計得点の算出
             }
-            else if (mFieldStatusArray[h][w] == -1) {
+            else if (mFieldStatusArray[y][x] == -1) {
                 enemyAgentsCount ++;
-                mFieldAgentsIDArray[h][w] = -enemyAgentsCount;  // エージェントにIDを振り分ける
+                mFieldAgentsIDArray[y][x] = -enemyAgentsCount;  // エージェントにIDを振り分ける
                 
-                mEnemyTilePoints += mFieldPointsArray[h][w];    // 初期段階の合計得点の算出
+                mEnemyTilePoints += mFieldPointsArray[y][x];    // 初期段階の合計得点の算出
             }
             
             // 最大値と最小値の検出
-            if (mFieldPointsArray[h][w] > maxPoint) {
-                maxPoint = mFieldPointsArray[h][w];
+            if (mFieldPointsArray[y][x] > maxPoint) {
+                maxPoint = mFieldPointsArray[y][x];
             }
-            if (mFieldPointsArray[h][w] < minPoint) {
-                minPoint = mFieldPointsArray[h][w];
+            if (mFieldPointsArray[y][x] < minPoint) {
+                minPoint = mFieldPointsArray[y][x];
             }
         }
         
@@ -205,16 +205,16 @@ bool Field::isCursorOnTheSquare(const Vec2 argPosition) {
  領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する。
  
  @param argFieldMark    フィールドの領域に認定したかどうか（一時的な配列）
- @param argStartW       領域探索の始点のマスのx座標
- @param argStartH       領域探索の始点のマスのy座標
- @param argW            現在探索中のマスのx座標
- @param argH            現在探索中のマスのy座標
+ @param argStartX       領域探索の始点のマスのx座標
+ @param argStartY       領域探索の始点のマスのy座標
+ @param argX            現在探索中のマスのx座標
+ @param argY            現在探索中のマスのy座標
  @param argParentNode   親ノード(Nodeクラス)のポインタ
  */
-void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int argStartW, const int argStartH, const int argW, const int argH, Node* argParentNode) {
-    int w, h;
+void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int argStartX, const int argStartY, const int argX, const int argY, Node* argParentNode) {
+    int x, y;
     int nodes = 0;
-    Node node(argW, argH, argParentNode);
+    Node node(argX, argY, argParentNode);
     
     if (argParentNode != nullptr) {
         argParentNode->setChildNode(&node);
@@ -222,7 +222,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
     
     // どちらのチームが対象か
     TileStatus::Type team;
-    if (mFieldStatusArray[argStartH][argStartW] == TileStatus::ALLY) {
+    if (mFieldStatusArray[argStartY][argStartX] == TileStatus::ALLY) {
         team = TileStatus::ALLY;
     }
     else {
@@ -230,8 +230,8 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
     }
     
     for (int i = 0; i < DIRECTIONS; i++) {
-        w = argW;
-        h = argH;
+        x = argX;
+        y = argY;
         
         // 「とどまる」は除く
         if (gMoveDirections[i].x == 0 && gMoveDirections[i].y == 0) {
@@ -240,19 +240,19 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         
         // 対象となるマスをずらす
         // フィールドから出たらcontinue
-        if (w+gMoveDirections[i].x < 0 || h+gMoveDirections[i].y < 0 || w+gMoveDirections[i].x > mFieldSizeW-1 || h+gMoveDirections[i].y > mFieldSizeH-1) {
+        if (x+gMoveDirections[i].x < 0 || y+gMoveDirections[i].y < 0 || x+gMoveDirections[i].x > mFieldSizeW-1 || y+gMoveDirections[i].y > mFieldSizeH-1) {
             continue;
         }
         
-        w += gMoveDirections[i].x;
-        h += gMoveDirections[i].y;
+        x += gMoveDirections[i].x;
+        y += gMoveDirections[i].y;
         
         // 周囲に自チームのものではないタイルがなければcontinue
         bool areThereOthersTiles = false;
         for (int j = 0; j < 4; j++) {
-            if (w+gSearchTileDirections[j].x >= 0 && h+gSearchTileDirections[j].y >= 0 &&
-                w+gSearchTileDirections[j].x <= mFieldSizeW-1 && h+gSearchTileDirections[j].y <= mFieldSizeH-1) {
-                if (mFieldStatusArray[h+gSearchTileDirections[j].y][w+gSearchTileDirections[j].x] != team) {
+            if (x+gSearchTileDirections[j].x >= 0 && y+gSearchTileDirections[j].y >= 0 &&
+                x+gSearchTileDirections[j].x <= mFieldSizeW-1 && y+gSearchTileDirections[j].y <= mFieldSizeH-1) {
+                if (mFieldStatusArray[y+gSearchTileDirections[j].y][x+gSearchTileDirections[j].x] != team) {
                     areThereOthersTiles = true;
                     break;
                 }
@@ -263,7 +263,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         }
         
         // 違う色のマスならcontinue
-        if (mFieldStatusArray[h][w] != team) {
+        if (mFieldStatusArray[y][x] != team) {
             continue;
         }
         
@@ -278,9 +278,9 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                 
                 parentNode = parentNode->getParentNode();
                 
-                if (parentNode->getPosition().x == w && parentNode->getPosition().y == h) {
-                    if ((w == argStartW && h == argStartH && !argFieldMark[argStartH][argStartW]) ||
-                        (w != argStartW && h != argStartH)) {
+                if (parentNode->getPosition().x == x && parentNode->getPosition().y == y) {
+                    if ((x == argStartX && y == argStartY && !argFieldMark[argStartY][argStartX]) ||
+                        (x != argStartX && y != argStartY)) {
                         cont = true;
                         break;
                     }
@@ -294,8 +294,8 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         // すでに通ったマスの場合:
         //  -> 始点のマスなら囲いを検知する
         //  -> そうでなければcontinue
-        if (argFieldMark[h][w]) {
-            if (argFieldMark[argStartH][argStartW] && w == argStartW && h == argStartH && node.getTreeHigh() >= 3) {
+        if (argFieldMark[y][x]) {
+            if (argFieldMark[argStartY][argStartX] && x == argStartX && y == argStartY && node.getTreeHigh() >= 3) {
                 // マスを囲う辺がどの方向にあるか調査する
                 // 現在のノードから親ノードをたどっていく
                 Node* searchingNode = &node;
@@ -313,69 +313,69 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                     
                     // 直線の係数を算出
                     int slope;
-                    if (searchingNode->getPosition().x == w || searchingNode->getPosition().y == h) {
+                    if (searchingNode->getPosition().x == x || searchingNode->getPosition().y == y) {
                         slope = 0;      // 傾きがなければ0
                     }
                     else {
-                        slope = (searchingNode->getPosition().y - h) / (searchingNode->getPosition().x - w);
+                        slope = (searchingNode->getPosition().y - y) / (searchingNode->getPosition().x - x);
                     }
                     
                     // 直線の向きを指定
-                    int directionW, directionH;
-                    if (searchingNode->getPosition().x > w) {
-                        directionW = -1;            // 親ノードのタイルx座標 > このタイルのx座標
+                    int directionX, directionY;
+                    if (searchingNode->getPosition().x > x) {
+                        directionX = -1;            // 親ノードのタイルx座標 > このタイルのx座標
                     }
-                    else if (searchingNode->getPosition().x < w) {
-                        directionW = 1;             // 親ノードのタイルx座標 < このタイルのx座標
+                    else if (searchingNode->getPosition().x < x) {
+                        directionX = 1;             // 親ノードのタイルx座標 < このタイルのx座標
                     }
                     else {
-                        directionW = 0;             // 親ノードのタイルx座標 == このタイルのx座標
+                        directionX = 0;             // 親ノードのタイルx座標 == このタイルのx座標
                     }
                     
-                    if (searchingNode->getPosition().y > h) {
-                        directionH = -1;            // 親ノードのタイルy座標 > このタイルのy座標
+                    if (searchingNode->getPosition().y > y) {
+                        directionY = -1;            // 親ノードのタイルy座標 > このタイルのy座標
                     }
-                    else if (searchingNode->getPosition().y < h) {
-                        directionH = 1;             // 親ノードのタイルy座標 < このタイルのy座標
+                    else if (searchingNode->getPosition().y < y) {
+                        directionY = 1;             // 親ノードのタイルy座標 < このタイルのy座標
                     }
                     else {
-                        directionH = 0;             // 親ノードのタイルy座標 == このタイルのy座標
+                        directionY = 0;             // 親ノードのタイルy座標 == このタイルのy座標
                     }
                     
                     // 直線の始点 = 親ノードのタイル
-                    int lineW = searchingNode->getPosition().x, lineH = searchingNode->getPosition().y;
+                    int lineX = searchingNode->getPosition().x, lineY = searchingNode->getPosition().y;
                     
                     whiteTiles = 0;
-                    int lineWBefore, lineHBefore;
+                    int lineXBefore, lineYBefore;
                     
                     // 直線をたどっていき、その間に自チームのタイルがないマスがいくつあるか数える
                     while(1) {
-                        lineWBefore = lineW;
-                        lineHBefore = lineH;
+                        lineXBefore = lineX;
+                        lineYBefore = lineY;
                         
-                        if (directionW != 0) {
-                            lineW += directionW;
-                            lineH = slope * lineW + searchingNode->getPosition().y;
+                        if (directionX != 0) {
+                            lineX += directionX;
+                            lineY = slope * lineX + searchingNode->getPosition().y;
                         }
                         else {
-                            lineH += directionH;
+                            lineY += directionY;
                         }
                         
                         // フィールドの外に出たらbreak
-                        if (lineW < 0 || lineH < 0 || lineW > mFieldSizeW-1 || lineH > mFieldSizeH-1) {
+                        if (lineX < 0 || lineY < 0 || lineX > mFieldSizeW-1 || lineY > mFieldSizeH-1) {
                             break;
                         }
                         
                         // 自チームのタイルがなければカウント
                         // 条件: 自チームのタイルがなく、自チームの領域にも含まれていない
-                        if (mFieldStatusArray[lineH][lineW] != team &&
-                            ((team == TileStatus::ALLY && !mFieldAllyAreaSquaresArray[lineH][lineW]) ||
-                             (team == TileStatus::ENEMY && !mFieldEnemyAreaSquaresArray[lineH][lineW]))) {
+                        if (mFieldStatusArray[lineY][lineX] != team &&
+                            ((team == TileStatus::ALLY && !mFieldAllyAreaSquaresArray[lineY][lineX]) ||
+                             (team == TileStatus::ENEMY && !mFieldEnemyAreaSquaresArray[lineY][lineX]))) {
                                 whiteTiles ++;
                             }
                         
                         // 目的のマスにたどり着いたときの処理
-                        if (lineW == w && lineH == h) {
+                        if (lineX == x && lineY == y) {
                             // 自チーム以外のタイルのカウントが1以上なら、領域を認識する
                             if (whiteTiles > 0) {
                                 //cout << "囲いを検知(" << team << "): ";
@@ -392,7 +392,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                 else {
                                     areaSquares = mFieldEnemyAreaSquaresArray;
                                 }
-                                bool areThereAreaPoints = searchAreaPointsSquares(areaSquares, lineWBefore, lineHBefore, team, false);
+                                bool areThereAreaPoints = searchAreaPointsSquares(areaSquares, lineXBefore, lineYBefore, team, false);
                                 
                                 // 領域が確認できたら...
                                 if (areThereAreaPoints) {
@@ -450,14 +450,14 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         }
         
         // 始点から2マス以上離れていたら、始点にもマークを付ける（初期状態ではついていない）
-        if (!argFieldMark[argStartH][argStartW] && (abs(argStartW-w) >= 2 || abs(argStartH-h) >= 2)) {
-            argFieldMark[argStartH][argStartW] = true;
+        if (!argFieldMark[argStartY][argStartX] && (abs(argStartX-x) >= 2 || abs(argStartY-y) >= 2)) {
+            argFieldMark[argStartY][argStartX] = true;
         }
         
         // マスにマークを付ける
-        argFieldMark[h][w] = true;
+        argFieldMark[y][x] = true;
         
-        searchAreaPointsSide(argFieldMark, argStartW, argStartH, w, h, &node);
+        searchAreaPointsSide(argFieldMark, argStartX, argStartY, x, y, &node);
         
         nodes ++;
     }
@@ -475,15 +475,15 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
  フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める。
  領域が成立するならtrue, 成立しないならfalseを返す。
  
- @param argAreaSquares 領域にマスが含まれているかどうかを示す一時的な配列
- @param argStartW 領域探索の始点のマスのx座標
- @param argStartH 領域探索の始点のマスのy座標
+ @param argAreaSquares  領域にマスが含まれているかどうかを示す一時的な配列
+ @param argStartX       領域探索の始点のマスのx座標
+ @param argStartY       領域探索の始点のマスのy座標
  @param argBeTileStatus タイルをどちらのちチームの領域にしたいか（TileStatus::ALLY or TileStatus::ENEMY）
- @param argDeleteArea 領域を解除したいときはtrue, 領域を設定したいときはfalse
+ @param argDeleteArea   領域を解除したいときはtrue, 領域を設定したいときはfalse
  @return 領域が成立すればtrue, しないならfalse（領域の解除に成功した場合もfalse）
  */
-bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const int argStartW, const int argStartH, const int argBeTileStatus, const bool argDeleteArea) {
-    int w, h;
+bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const int argStartX, const int argStartY, const int argBeTileStatus, const bool argDeleteArea) {
+    int x, y;
     bool possible = true;
     
     // 領域を探索する対象のチーム
@@ -501,39 +501,39 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
     
     // 領域内に指定
     if (!argDeleteArea) {
-        if (!argAreaSquares[argStartH][argStartW]) {
-            argAreaSquares[argStartH][argStartW] = true;
+        if (!argAreaSquares[argStartY][argStartX]) {
+            argAreaSquares[argStartY][argStartX] = true;
         }
     }
     // 領域を解除（argDeleteArea == true）するとき
     else {
-        argAreaSquares[argStartH][argStartW] = false;
+        argAreaSquares[argStartY][argStartX] = false;
     }
     
     // 周囲4方向のマスの確認
     for (int i = 0; i < 4; i++) {
-        w = argStartW + gSearchTileDirections[i].x;
-        h = argStartH + gSearchTileDirections[i].y;
+        x = argStartX + gSearchTileDirections[i].x;
+        y = argStartY + gSearchTileDirections[i].y;
         
         // フィールドから出たら: 領域ができていないためループから出てfalseを返す
-        if (w < 0 || h < 0 || w > mFieldSizeW-1 || h > mFieldSizeH-1) {
+        if (x < 0 || y < 0 || x > mFieldSizeW-1 || y > mFieldSizeH-1) {
             possible = false;
             break;
         }
         
         // 同じ色のマスにあたったら: continue
-        if (mFieldStatusArray[h][w] == argBeTileStatus) {
+        if (mFieldStatusArray[y][x] == argBeTileStatus) {
             continue;
         }
         
         // 領域の探索のとき すでに領域内に指定されているマスなら: continue
-        if (!argDeleteArea && (argAreaSquares[h][w] == true)) {
+        if (!argDeleteArea && (argAreaSquares[y][x] == true)) {
             continue;
         }
         
         // 領域の解除のとき 自チームの領域でなければ
-        if (argDeleteArea && !argAreaSquares[h][w]) {
-            if (mFieldStatusArray[h][w] == TileStatus::NONE) {
+        if (argDeleteArea && !argAreaSquares[y][x]) {
+            if (mFieldStatusArray[y][x] == TileStatus::NONE) {
                 possible = false;
             }
             continue;
@@ -541,7 +541,7 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         
         // 周囲にまだ領域として指定していないマスがあったら: そのマスに移動
         // 領域の解除の場合は領域として指定されているマスがあったら
-        bool nextTile = searchAreaPointsSquares(argAreaSquares, w, h, argBeTileStatus, argDeleteArea);
+        bool nextTile = searchAreaPointsSquares(argAreaSquares, x, y, argBeTileStatus, argDeleteArea);
         
         if (!nextTile) {
             possible = false;   // 移動先で領域が成立しないことがわかったら: possible = false（領域実現不可）
@@ -564,13 +564,12 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
  この関数は、再帰関数であるsearchAreaPointsSideの呼び出し用の関数で、
  この関数自体は領域の探索を行わない。
  
- @param argStartW 領域探索の始点のマスのx座標
- @param argStartH 領域探索の始点のマスのy座標
+ @param argStartX 領域探索の始点のマスのx座標
+ @param argStartY 領域探索の始点のマスのy座標
  */
-void Field::searchAreaPoints(const int argStartW, const int argStartH) {
-    //cout << "-----------------------(" << argStartW << ',' << argStartH << ")-----------------------" << endl;
+void Field::searchAreaPoints(const int argStartX, const int argStartY) {
     vector<vector<bool>> fieldMark(mFieldSizeH, vector<bool>(mFieldSizeW, false));
-    searchAreaPointsSide(fieldMark, argStartW, argStartH, argStartW, argStartH, nullptr);
+    searchAreaPointsSide(fieldMark, argStartX, argStartY, argStartX, argStartY, nullptr);
 }
 
 /**
@@ -578,15 +577,15 @@ void Field::searchAreaPoints(const int argStartW, const int argStartH) {
  マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
  
  @param argSquarePosition   マスの描画位置 Vec2型
- @param argW                マスのx座標
- @param argH                マスのy座標
+ @param argX                マスのx座標
+ @param argY                マスのy座標
  @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
  */
-void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor) {
+void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor) {
     Color agentIDRectColor = Palette::White;
     
     // 味方のタイルのとき
-    if (mFieldStatusArray[argH][argW] == 1) {
+    if (mFieldStatusArray[argY][argX] == 1) {
         if (mAllyTeamColor == TeamColor::BLUE) {
             agentIDRectColor = Color(0, 128, 255); // 青
             rectColor = Color(0, 100, 200);
@@ -598,13 +597,13 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int a
         }
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
-        if (mFieldAgentsIDArray[argH][argW] != 0) {
+        if (mFieldAgentsIDArray[argY][argX] != 0) {
             Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
             mAgentIDTextFont(U"Ally").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
         }
     }
     // 相手のタイルのとき
-    if (mFieldStatusArray[argH][argW] == -1) {
+    if (mFieldStatusArray[argY][argX] == -1) {
         if (!mAllyTeamColor == TeamColor::BLUE) {
             agentIDRectColor = Color(0, 128, 255); // 青
             rectColor = Color(0, 100, 200);
@@ -616,7 +615,7 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int a
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
         
-        if (mFieldAgentsIDArray[argH][argW] != 0) {
+        if (mFieldAgentsIDArray[argY][argX] != 0) {
             Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
             mAgentIDTextFont(U"Enemy").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
         }
@@ -628,14 +627,14 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argW, const int a
  領域マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
  
  @param argSquarePosition   マスの描画位置 Vec2型
- @param argW                マスのx座標
- @param argH                マスのy座標
+ @param argX                マスのx座標
+ @param argY                マスのy座標
  */
-void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const int argH) {
+void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const int argY) {
     Color rectColor;
     
     // 味方の領域のとき
-    if (mFieldAllyAreaSquaresArray[argH][argW]) {
+    if (mFieldAllyAreaSquaresArray[argY][argX]) {
         if (mAllyTeamColor == TeamColor::BLUE) {
             rectColor = Color(150, 150, 255);   // 青
             
@@ -647,7 +646,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const i
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
     }
     // 相手の領域のとき
-    if (mFieldEnemyAreaSquaresArray[argH][argW]) {
+    if (mFieldEnemyAreaSquaresArray[argY][argX]) {
         if (!mAllyTeamColor == TeamColor::BLUE) {
             rectColor = Color(150, 150, 255);   // 青
         }
@@ -658,7 +657,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const i
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
     }
     // 両チームの領域のとき
-    if (mFieldAllyAreaSquaresArray[argH][argW] && mFieldEnemyAreaSquaresArray[argH][argW]) {
+    if (mFieldAllyAreaSquaresArray[argY][argX] && mFieldEnemyAreaSquaresArray[argY][argX]) {
         rectColor = Color(200, 100, 200);       // 紫
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
@@ -670,24 +669,24 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argW, const i
  タイル点数の表示
  
  @param argSquarePosition   表示するマスの描画位置 Vec2型
- @param argW                表示するマスのx座標
- @param argH                表示するマスのy座標
+ @param argX                表示するマスのx座標
+ @param argY                表示するマスのy座標
  @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
  */
-void Field::printSquarePoint(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor) {
-    unsigned long int textLength = to_string(mFieldPointsArray[argH][argW]).length();
+void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor) {
+    unsigned long int textLength = to_string(mFieldPointsArray[argY][argX]).length();
     
     Color textColor = Palette::Black;
     if (rectColor != Palette::White) {
         textColor = Palette::White;
     }
     
-    if (mFieldPointsArray[argH][argW] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
-        mPointTextFontBold(mFieldPointsArray[argH][argW])
+    if (mFieldPointsArray[argY][argX] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
+        mPointTextFontBold(mFieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/2-5, Color(textColor));
     }
     else {                                                      // 得点が上位20％(=mBigPointsBorder)未満なら普通の字
-        mPointTextFont(mFieldPointsArray[argH][argW])
+        mPointTextFont(mFieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/2-5, Color(textColor));
     }
 }
@@ -698,44 +697,44 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argW, const
  エージェントの移動、タイルの除去などを行う。
  相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
  
- @param argW        エージェントの移動先のマスのx座標
- @param argH        エージェントの移動先のマスのy座標
- @param argBeforeW  エージェントの移動前のマスのx座標
- @param argBeforeH  エージェントの移動前のマスのy座標
+ @param argX        エージェントの移動先のマスのx座標
+ @param argY        エージェントの移動先のマスのy座標
+ @param argBeforeX  エージェントの移動前のマスのx座標
+ @param argBeforeY  エージェントの移動前のマスのy座標
  */
-void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
-    int team = mFieldStatusArray[argBeforeH][argBeforeW];
+void Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
+    int team = mFieldStatusArray[argBeforeY][argBeforeX];
     
-    if (Vec2{argH, argW} != Vec2{-1, -1}) {
+    if (Vec2{argY, argX} != Vec2{-1, -1}) {
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
-        if (mFieldStatusArray[argH][argW] == (-1)*mFieldStatusArray[argBeforeH][argBeforeW] && mFieldAgentsIDArray[argH][argW] == 0) {
-            mFieldStatusArray[argH][argW] = 0;
+        if (mFieldStatusArray[argY][argX] == (-1)*mFieldStatusArray[argBeforeY][argBeforeX] && mFieldAgentsIDArray[argY][argX] == 0) {
+            mFieldStatusArray[argY][argX] = 0;
             
             // 相手から点数を引く
             if (mCurrentAgentID > 0) {
-                mEnemyTilePoints -= mFieldPointsArray[argH][argW];
+                mEnemyTilePoints -= mFieldPointsArray[argY][argX];
             }
             else {
-                mAllyTilePoints -= mFieldPointsArray[argH][argW];
+                mAllyTilePoints -= mFieldPointsArray[argY][argX];
             }
             
             // 相手チームの領域に隣接していたら、相手チームの領域を再計算
             for (int i = 0; i < 4; i++) {
-                if (argW+gSearchTileDirections[i].x < 0 || argH+gSearchTileDirections[i].y < 0 ||
-                    argW+gSearchTileDirections[i].x > mFieldSizeW-1 || argH+gSearchTileDirections[i].y > mFieldSizeH-1) {
+                if (argX+gSearchTileDirections[i].x < 0 || argY+gSearchTileDirections[i].y < 0 ||
+                    argX+gSearchTileDirections[i].x > mFieldSizeW-1 || argY+gSearchTileDirections[i].y > mFieldSizeH-1) {
                     continue;
                 }
                 
                 // 領域の辺を成すタイルなら、除去後も領域が成立するか確認
                 // 成立しなければ、領域を解除する
-                if ((team == TileStatus::ENEMY && mFieldAllyAreaSquaresArray[argH+gSearchTileDirections[i].y][argW+gSearchTileDirections[i].x]) ||
-                    (team == TileStatus::ALLY && mFieldEnemyAreaSquaresArray[argH+gSearchTileDirections[i].y][argW+gSearchTileDirections[i].x])) {
-                    if (mFieldAreaSideLinesArray[argH][argW]) {
+                if ((team == TileStatus::ENEMY && mFieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
+                    (team == TileStatus::ALLY && mFieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
+                    if (mFieldAreaSideLinesArray[argY][argX]) {
                         
                         // 味方チームのエージェントが相手チームのタイルを除去するとき
                         if (mCurrentAgentID > 0) {
                             vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argW+gSearchTileDirections[i].x, argH+gSearchTileDirections[i].y, TileStatus::ENEMY, true);
+                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, true);
                             
                             if (!areThereArea) {
                                 // 領域ポイントに反映
@@ -751,7 +750,7 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
                                 
                                 // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
                                 // 成立するなら領域を解除しない
-                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argW, argH, TileStatus::ENEMY, false);
+                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ENEMY, false);
                                 
                                 if (areaRecheck) {
                                     // 領域ポイントに反映
@@ -770,7 +769,7 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
                         // 相手チームのエージェントが味方チームのタイルを除去するとき
                         else if (mCurrentAgentID < 0) {
                             vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argW+gSearchTileDirections[i].x, argH+gSearchTileDirections[i].y, TileStatus::ALLY, true);
+                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, true);
                             
                             if (!areThereArea) {
                                 // 領域ポイントに反映
@@ -786,7 +785,7 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
                                 
                                 // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
                                 // 成立するなら領域を解除しない
-                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argW, argH, TileStatus::ALLY, false);
+                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ALLY, false);
                                 
                                 if (areaRecheck) {
                                     // 領域ポイントに反映
@@ -806,7 +805,7 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
                     else {
                         if (mCurrentAgentID > 0) {
                             vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argW+gSearchTileDirections[i].x, argH+gSearchTileDirections[i].y, TileStatus::ALLY, false);
+                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, false);
                             
                             if (areThereArea) {
                                 mFieldAllyAreaSquaresArray = areaSquares;
@@ -814,7 +813,7 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
                         }
                         else if (mCurrentAgentID < 0) {
                             vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argW+gSearchTileDirections[i].x, argH+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
+                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
                             
                             if (areThereArea) {
                                 mFieldEnemyAreaSquaresArray = areaSquares;
@@ -825,34 +824,34 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
             }
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
-        else if (mFieldAgentsIDArray[argH][argW] == 0) {
-            mCurrentSquarePosition = {argW, argH};
+        else if (mFieldAgentsIDArray[argY][argX] == 0) {
+            mCurrentSquarePosition = {argX, argY};
             
-            if (mFieldStatusArray[argH][argW] != mFieldStatusArray[argBeforeH][argBeforeW]) {
-                mFieldStatusArray[argH][argW] = mFieldStatusArray[argBeforeH][argBeforeW];
+            if (mFieldStatusArray[argY][argX] != mFieldStatusArray[argBeforeY][argBeforeX]) {
+                mFieldStatusArray[argY][argX] = mFieldStatusArray[argBeforeY][argBeforeX];
                 
                 if (mCurrentAgentID > 0) {
-                    if (mFieldAllyAreaSquaresArray[argH][argW]) {
-                        mFieldAllyAreaSquaresArray[argH][argW] = false;
-                        mAllyAreaPoints -= abs(mFieldPointsArray[argH][argW]);
+                    if (mFieldAllyAreaSquaresArray[argY][argX]) {
+                        mFieldAllyAreaSquaresArray[argY][argX] = false;
+                        mAllyAreaPoints -= abs(mFieldPointsArray[argY][argX]);
                     }
                     
-                    mAllyTilePoints += mFieldPointsArray[argH][argW];       // タイルポイントにマスの得点を加算
+                    mAllyTilePoints += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
                 }
                 else {
-                    if (mFieldEnemyAreaSquaresArray[argH][argW]) {
-                        mFieldEnemyAreaSquaresArray[argH][argW] = false;
-                        mEnemyAreaPoints -= abs(mFieldPointsArray[argH][argW]);
+                    if (mFieldEnemyAreaSquaresArray[argY][argX]) {
+                        mFieldEnemyAreaSquaresArray[argY][argX] = false;
+                        mEnemyAreaPoints -= abs(mFieldPointsArray[argY][argX]);
                     }
                     
-                    mEnemyTilePoints += mFieldPointsArray[argH][argW];      // タイルポイントにマスの得点を加算
+                    mEnemyTilePoints += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
                 }
             }
             
-            mFieldAgentsIDArray[argH][argW] = mCurrentAgentID;
-            mFieldAgentsIDArray[argBeforeH][argBeforeW] = 0;
+            mFieldAgentsIDArray[argY][argX] = mCurrentAgentID;
+            mFieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
             
-            searchAreaPoints(argW, argH);
+            searchAreaPoints(argX, argY);
         }
     }
     
@@ -864,19 +863,19 @@ void Field::agentMovement(int argW, int argH, int argBeforeW, int argBeforeH) {
  Field::setCurrentAgent:
  選択するエージェントの変更処理
  
- @param argW カーソルで選択されたx座標
- @param argH カーソルで選択されたy座標
+ @param argX カーソルで選択されたx座標
+ @param argY カーソルで選択されたy座標
  */
-void Field::setCurrentAgent(int argW, int argH) {
+void Field::setCurrentAgent(int argX, int argY) {
     // 新しくエージェントを選択するとき
-    if (mFieldAgentsIDArray[argH][argW] != 0) {
-        if (mCurrentAgentID == mFieldAgentsIDArray[argH][argW]) {
+    if (mFieldAgentsIDArray[argY][argX] != 0) {
+        if (mCurrentAgentID == mFieldAgentsIDArray[argY][argX]) {
             mCurrentSquarePosition = {-1, -1};
             mCurrentAgentID = 0;
         }
         else {
-            mCurrentSquarePosition = {argW, argH};
-            mCurrentAgentID = mFieldAgentsIDArray[argH][argW];
+            mCurrentSquarePosition = {argX, argY};
+            mCurrentAgentID = mFieldAgentsIDArray[argY][argX];
         }
     }
 }
@@ -886,13 +885,13 @@ void Field::setCurrentAgent(int argW, int argH) {
  フィールドの縦線・横線の描画
  */
 void Field::drawSquares() {
-    for (int w = 0; w < mFieldSizeW; w++) {
-        Line(w*mFieldSquareSize+mFieldLeftmostPoint, mFieldTopmostPoint,
-             w*mFieldSquareSize+mFieldLeftmostPoint, mFieldBottommostPoint).draw(Color(Palette::Gray));
+    for (int x = 0; x < mFieldSizeW; x++) {
+        Line(x*mFieldSquareSize+mFieldLeftmostPoint, mFieldTopmostPoint,
+             x*mFieldSquareSize+mFieldLeftmostPoint, mFieldBottommostPoint).draw(Color(Palette::Gray));
     }
-    for (int h = 0; h < mFieldSizeH; h++) {
-        Line(mFieldLeftmostPoint, h*mFieldSquareSize+mFieldTopmostPoint,
-             mFieldRightmostPoint, h*mFieldSquareSize+mFieldTopmostPoint).draw(Color(Palette::Gray));
+    for (int y = 0; y < mFieldSizeH; y++) {
+        Line(mFieldLeftmostPoint, y*mFieldSquareSize+mFieldTopmostPoint,
+             mFieldRightmostPoint, y*mFieldSquareSize+mFieldTopmostPoint).draw(Color(Palette::Gray));
     }
 }
 
@@ -912,26 +911,26 @@ void Field::draw() {
     // マスの上にカーソルがあれば マスに枠を表示
     Vec2 currentSquarePositionBefore = mCurrentSquarePosition;
     
-    for (int h = 0; h < mFieldSizeH; h++) {
-        for (int w = 0; w < mFieldSizeW; w++) {
+    for (int y = 0; y < mFieldSizeH; y++) {
+        for (int x = 0; x < mFieldSizeW; x++) {
             // マスの描画位置
-            int squarePositionX = mFieldLeftmostPoint+w*mFieldSquareSize;
-            int squarePositionY = mFieldTopmostPoint+h*mFieldSquareSize;
+            int squarePositionX = mFieldLeftmostPoint+x*mFieldSquareSize;
+            int squarePositionY = mFieldTopmostPoint+y*mFieldSquareSize;
             
             // マスの塗りつぶし（どちらかのチームのタイルの場合）
             rectColor = Palette::White;
-            fillSquare(Vec2{squarePositionX, squarePositionY}, w, h, rectColor);
+            fillSquare(Vec2{squarePositionX, squarePositionY}, x, y, rectColor);
             
             // 領域の塗りつぶし（マスが囲まれている場合）
-            if (mFieldStatusArray[h][w] == TileStatus::NONE) {
-                fillAreaSquare(Vec2{squarePositionX, squarePositionY}, w, h);
+            if (mFieldStatusArray[y][x] == TileStatus::NONE) {
+                fillAreaSquare(Vec2{squarePositionX, squarePositionY}, x, y);
             }
             
             // 点数の表示
-            printSquarePoint(Vec2{squarePositionX, squarePositionY}, w, h, rectColor);
+            printSquarePoint(Vec2{squarePositionX, squarePositionY}, x, y, rectColor);
             
             // 枠の表示
-            if (isCursorOnTheSquare(Vec2(mFieldLeftmostPoint+w*mFieldSquareSize, mFieldTopmostPoint+h*mFieldSquareSize))) {
+            if (isCursorOnTheSquare(Vec2(mFieldLeftmostPoint+x*mFieldSquareSize, mFieldTopmostPoint+y*mFieldSquareSize))) {
                 // マウスが左クリックの状態かつ 選択されていたマスから移動できるマスならば、選択されているマスに設定
                 // エージェントを選択されているマスに移動
                 if (MouseL.pressed() && !mMousePressing) {
@@ -940,11 +939,11 @@ void Field::draw() {
                     // 周囲8方向のタイルの調査
                     for (int i=0; i<DIRECTIONS; i++) {
                         // エージェントの行動（移動・除去）を操作するとき
-                        if (currentSquarePositionBefore + gMoveDirections[i] == Vec2{w, h}) {
+                        if (currentSquarePositionBefore + gMoveDirections[i] == Vec2{x, y}) {
                             if (currentSquarePositionBefore != Vec2{-1, -1}) {
                                 // エージェントの行動に反映
                                 // 移動, 削除
-                                agentMovement(w, h, currentSquarePositionBefore.x, currentSquarePositionBefore.y);
+                                agentMovement(x, y, currentSquarePositionBefore.x, currentSquarePositionBefore.y);
                             }
                             
                             break;
@@ -952,7 +951,7 @@ void Field::draw() {
                     }
                     
                     // 新しくエージェントを選択するときの処理
-                    setCurrentAgent(w, h);
+                    setCurrentAgent(x, y);
                 }
                 else {
                     // カーソルが上にあればマスに黄色い枠を表示
@@ -961,7 +960,7 @@ void Field::draw() {
             }
             
             // マスが選択されている状態ならば 橙色の枠を表示
-            if (Vec2{w, h} == mCurrentSquarePosition) {
+            if (Vec2{x, y} == mCurrentSquarePosition) {
                 Rect(squarePositionX, squarePositionY, mFieldSquareSize, mFieldSquareSize).drawFrame(5, 0, Color(Palette::Orange));
             }
         }

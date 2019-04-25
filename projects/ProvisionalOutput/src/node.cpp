@@ -5,13 +5,13 @@
  Nodeクラスのコンストラクタ
  ノードの持つ座標と親ノードを設定する（親ノードがない場合はnullptrを指定）
  
- @param argW                ノードに設定するx座標
- @param argH                ノードに設定するy座標
+ @param argX                ノードに設定するx座標
+ @param argY                ノードに設定するy座標
  @param argParentNodePtr    設定する親ノードのポインタ
  */
-Node::Node(const int argW, const int argH, Node* argParentNodePtr) {
-    mW = argW;
-    mH = argH;
+Node::Node(const int argX, const int argY, Node* argParentNodePtr) {
+    mX = argX;
+    mY = argY;
     mThisNodePtr = this;
     mParentNodePtr = argParentNodePtr;
     
@@ -87,7 +87,7 @@ Node* Node::getThisNode() {
  @return このノードが持つ座標
  */
 Vec2 Node::getPosition() {
-    return Vec2{mW, mH};
+    return Vec2{mX, mY};
 }
 
 /**

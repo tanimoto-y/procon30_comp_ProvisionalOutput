@@ -14,11 +14,11 @@ class Node {
     Node* mParentNodePtr = nullptr;     // 親ノードのポインタ
     Node* mThisNodePtr;                 // このノードのポインタ
     
-    int mW, mH;                         // 座標
+    int mX, mY;                         // 座標
     int mTreeHigh;                      // ノードの高さ
     
 public:
-    Node(const int argW, const int argH, Node* argParentNodePtr);   // コンストラクタ
+    Node(const int argX, const int argY, Node* argParentNodePtr);   // コンストラクタ
     void setChildNode(Node* argChildNodePtr);                       // 子ノードの設定
     Node* getChildNode(const int n);                                // 子ノードのポインタを返す
     void setParentNode(Node* argParentNodePtr);                     // 子ノードの設定

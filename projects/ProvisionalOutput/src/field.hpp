@@ -133,24 +133,24 @@ public:
     bool isCursorOnTheSquare(const Vec2 argPosition);
     
     // 領域ポイントの取得
-    void searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int argStartW, const int argStartH, const int argW, const int argH, Node* argParentNode);
-    bool searchAreaPointsSquares(vector<vector<bool>>& argAreaSquares, const int argStartW, const int argStartH, const int argBeTileStatus, const bool argDeleteArea);
-    void searchAreaPoints(const int argStartW, const int argStartH);
+    void searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int argStartX, const int argStartY, const int argX, const int argY, Node* argParentNode);
+    bool searchAreaPointsSquares(vector<vector<bool>>& argAreaSquares, const int argStartX, const int argStartY, const int argBeTileStatus, const bool argDeleteArea);
+    void searchAreaPoints(const int argStartX, const int argStartY);
     
     // マスの塗りつぶし
-    void fillSquare(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor);
+    void fillSquare(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
     // 領域の塗りつぶし
-    void fillAreaSquare(const Vec2 argSquarePosition, const int argW, const int argH);
+    void fillAreaSquare(const Vec2 argSquarePosition, const int argX, const int argY);
     
     // タイル点数の表示
-    void printSquarePoint(const Vec2 argSquarePosition, const int argW, const int argH, Color& rectColor);
+    void printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
     // エージェントの行動
-    void agentMovement(int argW, int argH, int argBeforeW, int argBeforeH);
+    void agentMovement(int argX, int argY, int argBeforeX, int argBeforeY);
     
     // 選択するエージェントの変更
-    void setCurrentAgent(int argW, int argH);
+    void setCurrentAgent(int argX, int argY);
     
     // マスの描画
     void drawSquares();
