@@ -260,6 +260,16 @@ void Main() {
     // フィールドの作成
     Field fieldData(fieldPointsArray, fieldStatusArray, Vec2(fieldSizeW, fieldSizeH), allyTeamColor);
     
+    // フィールドからエージェントの位置を取得
+    vector<pair<int, int>> allyAgentsPosition;
+    vector<pair<int, int>> enemyAgentsPosition;
+    fieldData.getAgentsPosition(allyAgentsPosition, enemyAgentsPosition);
+    
+    for (int i = 0; i < fieldData.getTotalTeamAgents(); i++) {
+        cout << "Ally [" << i << "] (Agent ID: " << i+1 << ") : (" << allyAgentsPosition[i].first << ',' << allyAgentsPosition[i].second << ") | ";
+        cout << "Enemy [" << i << "] (Agent ID: " << -(i+1) << ") : (" << enemyAgentsPosition[i].first << ',' << enemyAgentsPosition[i].second << ")" << endl;
+    }
+    
     /*---------------フォントの用意---------------*/
     // フィールド描画用
     const Font pointTextFont(fieldData.getFieldSquareSize()-POINT_TEXT_FONT_SIZE);

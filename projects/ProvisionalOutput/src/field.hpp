@@ -118,6 +118,14 @@ public:
     // フィールドの設定
     void setField(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray);
     
+    // フィールドからエージェントの位置を取得
+    // 要素番号はエージェントIDと同じで、相手のエージェントの場合はエージェントIDの絶対値が要素番号になる
+    // 例: 相手の1人目のエージェント（エージェントID -1）のx座標 -> argEnemyAgentsPosition[1].first
+    void getAgentsPosition(vector<pair<int, int>> &argAllyAgentsPosition, vector<pair<int, int>> &argEnemyAgentsPosition);
+    
+    // 各チームのエージェントの人数を返す
+    int getTotalTeamAgents();
+    
     // フィールドの1マスの大きさを返す
     int getFieldSquareSize();
     

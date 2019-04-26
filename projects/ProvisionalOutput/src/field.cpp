@@ -107,6 +107,49 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     mTotalTeamAgents = allyAgentsCount;
 }
 
+
+/**
+ Field::getAgentsPosition:
+ フィールドからエージェントの位置を取得する。
+ 要素番号はエージェントIDと同じで、相手のエージェントの場合はエージェントIDの絶対値が要素番号になる。
+ 例: 相手の1人目のエージェント（エージェントID -1）のx座標 -> argEnemyAgentsPosition[1].first
+ 各配列は参照渡しであるため、この関数を実行することで自動的に座標が代入される。
+
+ @param argAllyAgentsPosition  味方のエージェントの座標配列
+ @param argEnemyAgentsPosition 相手のエージェントの座標配列
+ */
+void Field::getAgentsPosition(vector<pair<int, int>> &argAllyAgentsPosition, vector<pair<int, int>> &argEnemyAgentsPosition) {
+    int countAllyAgents = 0, countEnemyAgents = 0;
+    
+    argAllyAgentsPosition.resize(mTotalTeamAgents);
+    argEnemyAgentsPosition.resize(mTotalTeamAgents);
+    
+    for (int y = 0; y < mFieldSizeH; y++) {
+        for (int x = 0; x < mFieldSizeW; x++) {
+            // 味方のエージェント
+            if (mFieldAgentsIDArray[y][x] > 0) {
+                argAllyAgentsPosition[countAllyAgents] = {x, y};
+                countAllyAgents ++;
+            }
+            // 相手のエージェント
+            if (mFieldAgentsIDArray[y][x] < 0) {
+                argEnemyAgentsPosition[countEnemyAgents] = {x, y};
+                countEnemyAgents ++;
+            }
+        }
+    }
+}
+
+/**
+ Field::getTotalTeamAgents:
+ 各チームのエージェントの人数を返す
+
+ @return 各チームのエージェントの人数
+ */
+int Field::getTotalTeamAgents() {
+    return mTotalTeamAgents;
+}
+
 /**
  Field::getFieldSquareSize:
  フィールドの1マスの大きさ（mFieldSquareSize）を返す。
