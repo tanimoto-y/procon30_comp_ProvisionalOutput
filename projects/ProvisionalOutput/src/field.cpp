@@ -739,14 +739,17 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
  エージェントの行動
  エージェントの移動、タイルの除去などを行う。
  相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
+ 最後に、エージェントの行動の番号を返す。
  
  @param argX        エージェントの移動先のマスのx座標
  @param argY        エージェントの移動先のマスのy座標
  @param argBeforeX  エージェントの移動前のマスのx座標
  @param argBeforeY  エージェントの移動前のマスのy座標
+ @return エージェントの行動の番号（0~16）　field.hppのAgentActNumbersに定義済み
  */
-void Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
+int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
     int team = mFieldStatusArray[argBeforeY][argBeforeX];
+    int returnActNumber = 0;
     
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
@@ -865,6 +868,38 @@ void Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                     }
                 }
             }
+            
+            // 返す行動番号の取得
+            if (argY-argBeforeY == -1) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::REMOVE_LEFT_TOP;     // 左上を除去
+                }
+                else if (argX-argBeforeX == 0) {
+                    returnActNumber = AgentActNumbers::REMOVE_TOP;          // 上を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::REMOVE_RIGHT_TOP;    // 右上を除去
+                }
+            }
+            else if (argY-argBeforeY == 0) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::REMOVE_LEFT;         // 左を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::REMOVE_RIGHT;        // 右を除去
+                }
+            }
+            else if (argY-argBeforeY == 1) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::REMOVE_LEFT_BOTTOM;  // 左下を除去
+                }
+                else if (argX-argBeforeX == 0) {
+                    returnActNumber = AgentActNumbers::REMOVE_BOTTOM;       // 下を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::REMOVE_RIGHT_BOTTOM; // 右下を除去
+                }
+            }
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
         else if (mFieldAgentsIDArray[argY][argX] == 0) {
@@ -894,12 +929,47 @@ void Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             mFieldAgentsIDArray[argY][argX] = mCurrentAgentID;
             mFieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
             
+            // 領域ポイントができているか確認
             searchAreaPoints(argX, argY);
+            
+            // 返す行動番号の取得
+            if (argY-argBeforeY == -1) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::GOTO_LEFT_TOP;     // 左上を除去
+                }
+                else if (argX-argBeforeX == 0) {
+                    returnActNumber = AgentActNumbers::GOTO_TOP;          // 上を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::GOTO_RIGHT_TOP;    // 右上を除去
+                }
+            }
+            else if (argY-argBeforeY == 0) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::GOTO_LEFT;         // 左を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::GOTO_RIGHT;        // 右を除去
+                }
+            }
+            else if (argY-argBeforeY == 1) {
+                if (argX-argBeforeX == -1) {
+                    returnActNumber = AgentActNumbers::GOTO_LEFT_BOTTOM;  // 左下を除去
+                }
+                else if (argX-argBeforeX == 0) {
+                    returnActNumber = AgentActNumbers::GOTO_BOTTOM;       // 下を除去
+                }
+                else if (argX-argBeforeX == 1) {
+                    returnActNumber = AgentActNumbers::GOTO_RIGHT_BOTTOM; // 右下を除去
+                }
+            }
         }
     }
     
     mAllyPoints = mAllyTilePoints + mAllyAreaPoints;
     mEnemyPoints = mEnemyTilePoints + mEnemyAreaPoints;
+    
+    return returnActNumber;
 }
 
 /**
@@ -986,7 +1056,7 @@ void Field::draw() {
                             if (currentSquarePositionBefore != Vec2{-1, -1}) {
                                 // エージェントの行動に反映
                                 // 移動, 削除
-                                agentMovement(x, y, currentSquarePositionBefore.x, currentSquarePositionBefore.y);
+                                cout << "行動番号: " << agentMovement(x, y, currentSquarePositionBefore.x, currentSquarePositionBefore.y) << endl;
                             }
                             
                             break;

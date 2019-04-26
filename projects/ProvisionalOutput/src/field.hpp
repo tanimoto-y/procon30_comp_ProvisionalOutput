@@ -68,6 +68,31 @@ namespace AreaStatus {
     };
 }
 
+// エージェントの行動の番号
+namespace AgentActNumbers {
+    enum Type {
+        NONE                = 0,    // 動きなし
+        
+        GOTO_LEFT_TOP       = 1,    // 移動: 左上
+        GOTO_TOP            = 2,    // 移動: 上
+        GOTO_RIGHT_TOP      = 3,    // 移動: 右上
+        GOTO_RIGHT          = 4,    // 移動: 右
+        GOTO_RIGHT_BOTTOM   = 5,    // 移動: 右下
+        GOTO_BOTTOM         = 6,    // 移動: 下
+        GOTO_LEFT_BOTTOM    = 7,    // 移動: 左下
+        GOTO_LEFT           = 8,    // 移動: 左
+        
+        REMOVE_LEFT_TOP     = 9,    // 除去: 左上
+        REMOVE_TOP          = 10,   // 除去: 上
+        REMOVE_RIGHT_TOP    = 11,   // 除去: 右上
+        REMOVE_RIGHT        = 12,   // 除去: 右
+        REMOVE_RIGHT_BOTTOM = 13,   // 除去: 右下
+        REMOVE_BOTTOM       = 14,   // 除去: 下
+        REMOVE_LEFT_BOTTOM  = 15,   // 除去: 左下
+        REMOVE_LEFT         = 16,   // 除去: 左
+    };
+}
+
 // フィールドクラス
 class Field {
     // プライベートメンバ
@@ -155,7 +180,7 @@ public:
     void printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
     // エージェントの行動
-    void agentMovement(int argX, int argY, int argBeforeX, int argBeforeY);
+    int agentMovement(int argX, int argY, int argBeforeX, int argBeforeY);
     
     // 選択するエージェントの変更
     void setCurrentAgent(int argX, int argY);
