@@ -33,6 +33,16 @@ const Vec2 gSearchTileDirections[4] = {
     {0, -1}, {1, 0}, {0, 1}, {-1, 0}
 };
 
+// 得点の格納用の構造体
+typedef struct Score {
+    int tile = 0;
+    int area = 0;
+    
+    int total() {
+        return tile + area;
+    }
+} Points;
+
 // チームの色
 namespace TeamColor {
     enum Type {
@@ -103,14 +113,11 @@ class Field {
     vector<vector<bool>> mFieldEnemyAreaSquaresArray;   // 相手の領域の格納用
     vector<vector<bool>> mFieldAreaSideLinesArray;      // 領域を成す辺の格納用
     
-    int mAllyPoints  = 0;                           // 味方チームの合計得点
-    int mEnemyPoints = 0;                           // 相手チームの合計得点
+    vector<int> mAllyAgentsActNumbers;              // 味方エージェントの行動の番号
+    vector<int> mEnemyAgentsActNumbers;             // 相手エージェントの行動の番号
     
-    int mAllyTilePoints  = 0;                       // 味方チームのタイルポイント
-    int mEnemyTilePoints = 0;                       // 相手チームのタイルポイント
-    
-    int mAllyAreaPoints  = 0;                       // 相手チームの領域ポイント
-    int mEnemyAreaPoints = 0;                       // 相手チームの領域ポイント
+    Score mAllyScore;                               // 味方チームの得点（合計得点、タイルポイント、領域ポイントを含む構造体）
+    Score mEnemyScore;                              // 相手チームの得点（合計得点、タイルポイント、領域ポイントを含む構造体）
     
     int mFieldSizeW, mFieldSizeH;                   // フィールドの大きさ
     int mFieldLineLengthW, mFieldLineLengthH;       // フィールドの枠の長さ

@@ -63,6 +63,13 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     mFieldPointsArray = argFieldPointsArray;    // フィールドの得点
     mFieldStatusArray = argFieldStatusArray;    // フィールドの状況
     
+    mAllyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::NONE);  // 味方エージェントの行動番号の初期化
+    mEnemyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::NONE); // 相手エージェントの行動番号の初期化
+    
+    // 得点の初期化
+    mAllyScore  = Score{0, 0};
+    mEnemyScore = Score{0, 0};
+    
     int maxPoint = -16, minPoint = 16;
     int allyAgentsCount = 0, enemyAgentsCount = 0;
     
@@ -78,13 +85,13 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
                 allyAgentsCount ++;
                 mFieldAgentsIDArray[y][x] = allyAgentsCount;    // エージェントにIDを振り分ける
                 
-                mAllyTilePoints += mFieldPointsArray[y][x];     // 初期段階の合計得点の算出
+                mAllyScore.tile += mFieldPointsArray[y][x];     // 初期段階の合計得点の算出
             }
             else if (mFieldStatusArray[y][x] == -1) {
                 enemyAgentsCount ++;
                 mFieldAgentsIDArray[y][x] = -enemyAgentsCount;  // エージェントにIDを振り分ける
                 
-                mEnemyTilePoints += mFieldPointsArray[y][x];    // 初期段階の合計得点の算出
+                mEnemyScore.tile += mFieldPointsArray[y][x];    // 初期段階の合計得点の算出
             }
             
             // 最大値と最小値の検出
@@ -95,9 +102,6 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
                 minPoint = mFieldPointsArray[y][x];
             }
         }
-        
-        mAllyPoints = mAllyTilePoints;
-        mEnemyPoints = mEnemyTilePoints;
     }
     
     // 大きい点数の基準を決める（最大値-最小値の上位20％）
@@ -162,49 +166,49 @@ int Field::getFieldSquareSize() {
 
 /**
  Field::getTotalPoints:
- 合計得点(mAllyPoints, mEnemyPoints)を返す。
+ 合計得点(mAllyScore.total, mEnemyScore.total)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 合計得点
  */
 int Field::getTotalPoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
-        return mAllyPoints;
+        return mAllyScore.total();
     }
     else {                          // 敵
-        return mEnemyPoints;
+        return mEnemyScore.total();
     }
 }
 
 /**
  Field::getTilePoints:
- タイルポイント(mAllyTilePoints, mEnemyTilePoints)を返す。
+ タイルポイント(mAllyScore.tile, mEnemyScore.tile)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return タイルポイント
  */
 int Field::getTilePoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
-        return mAllyTilePoints;
+        return mAllyScore.tile;
     }
     else {                          // 敵
-        return mEnemyTilePoints;
+        return mEnemyScore.tile;
     }
 }
 
 /**
  Field::getAreaPoints:
- 領域ポイント(mAllyAreaPoints, mEnemyAreaPoints)を返す。
+ 領域ポイント(mAllyScore.area, mEnemyScore.area)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 領域ポイント
  */
 int Field::getAreaPoints(const Team::Type argTeam) {
     if (argTeam == Team::ALLY) {    // 味方
-        return mAllyAreaPoints;
+        return mAllyScore.area;
     }
     else {                          // 敵
-        return mEnemyAreaPoints;
+        return mEnemyScore.area;
     }
 }
 
@@ -441,16 +445,14 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                 if (areThereAreaPoints) {
                                     // 領域ポイントに反映
                                     if (team == TileStatus::ALLY) {
-                                        mAllyAreaPoints = 0;
-                                        mAllyPoints -= mAllyAreaPoints;
+                                        mAllyScore.area = 0;
                                         
                                         // 仮の領域への指定を反映
                                         mFieldAllyAreaSquaresArray = areaSquares;
                                         
                                     }
                                     else {
-                                        mEnemyAreaPoints = 0;
-                                        mEnemyPoints -= mEnemyAreaPoints;
+                                        mEnemyScore.area = 0;
                                         
                                         // 仮の領域への指定を反映
                                         mFieldEnemyAreaSquaresArray = areaSquares;
@@ -460,16 +462,13 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                     for (int j = 0; j < mFieldSizeH; j++) {
                                         for (int k = 0; k < mFieldSizeW; k++) {
                                             if (team == TileStatus::ALLY && mFieldAllyAreaSquaresArray[j][k]) {
-                                                mAllyAreaPoints += abs(mFieldPointsArray[j][k]);
+                                                mAllyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                             if (team == TileStatus::ENEMY && mFieldEnemyAreaSquaresArray[j][k]) {
-                                                mEnemyAreaPoints += abs(mFieldPointsArray[j][k]);
+                                                mEnemyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                         }
                                     }
-                                    
-                                    mAllyPoints += mAllyAreaPoints;
-                                    mEnemyPoints += mEnemyAreaPoints;
                                     
                                     // 領域を成す辺を反映
                                     Node* currentNode = &node;
@@ -748,8 +747,8 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
  @return エージェントの行動の番号（0~16）　field.hppのAgentActNumbersに定義済み
  */
 int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
-    int team = mFieldStatusArray[argBeforeY][argBeforeX];
-    int returnActNumber = 0;
+    int team = mFieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチーム
+    int actNumber = 0;      // 行動の番号
     
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
@@ -758,10 +757,10 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             
             // 相手から点数を引く
             if (mCurrentAgentID > 0) {
-                mEnemyTilePoints -= mFieldPointsArray[argY][argX];
+                mEnemyScore.tile -= mFieldPointsArray[argY][argX];
             }
             else {
-                mAllyTilePoints -= mFieldPointsArray[argY][argX];
+                mAllyScore.tile -= mFieldPointsArray[argY][argX];
             }
             
             // 相手チームの領域に隣接していたら、相手チームの領域を再計算
@@ -787,7 +786,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                                 for (int j = 0; j < mFieldSizeH; j++) {
                                     for (int k = 0; k < mFieldSizeW; k++) {
                                         if (mFieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                            mEnemyAreaPoints -= abs(mFieldPointsArray[j][k]);
+                                            mEnemyScore.area -= abs(mFieldPointsArray[j][k]);
                                         }
                                     }
                                 }
@@ -803,7 +802,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                                     for (int j = 0; j < mFieldSizeH; j++) {
                                         for (int k = 0; k < mFieldSizeW; k++) {
                                             if (!mFieldEnemyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                                mEnemyAreaPoints += abs(mFieldPointsArray[j][k]);
+                                                mEnemyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                         }
                                     }
@@ -822,7 +821,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                                 for (int j = 0; j < mFieldSizeH; j++) {
                                     for (int k = 0; k < mFieldSizeW; k++) {
                                         if (mFieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                            mAllyAreaPoints -= abs(mFieldPointsArray[j][k]);
+                                            mAllyScore.area -= abs(mFieldPointsArray[j][k]);
                                         }
                                     }
                                 }
@@ -838,7 +837,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                                     for (int j = 0; j < mFieldSizeH; j++) {
                                         for (int k = 0; k < mFieldSizeW; k++) {
                                             if (!mFieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                                mAllyAreaPoints += abs(mFieldPointsArray[j][k]);
+                                                mAllyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                         }
                                     }
@@ -872,32 +871,32 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::REMOVE_LEFT_TOP;     // 左上を除去
+                    actNumber = AgentActNumbers::REMOVE_LEFT_TOP;     // 左上を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    returnActNumber = AgentActNumbers::REMOVE_TOP;          // 上を除去
+                    actNumber = AgentActNumbers::REMOVE_TOP;          // 上を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::REMOVE_RIGHT_TOP;    // 右上を除去
+                    actNumber = AgentActNumbers::REMOVE_RIGHT_TOP;    // 右上を除去
                 }
             }
             else if (argY-argBeforeY == 0) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::REMOVE_LEFT;         // 左を除去
+                    actNumber = AgentActNumbers::REMOVE_LEFT;         // 左を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::REMOVE_RIGHT;        // 右を除去
+                    actNumber = AgentActNumbers::REMOVE_RIGHT;        // 右を除去
                 }
             }
             else if (argY-argBeforeY == 1) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::REMOVE_LEFT_BOTTOM;  // 左下を除去
+                    actNumber = AgentActNumbers::REMOVE_LEFT_BOTTOM;  // 左下を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    returnActNumber = AgentActNumbers::REMOVE_BOTTOM;       // 下を除去
+                    actNumber = AgentActNumbers::REMOVE_BOTTOM;       // 下を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::REMOVE_RIGHT_BOTTOM; // 右下を除去
+                    actNumber = AgentActNumbers::REMOVE_RIGHT_BOTTOM; // 右下を除去
                 }
             }
         }
@@ -911,18 +910,18 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 if (mCurrentAgentID > 0) {
                     if (mFieldAllyAreaSquaresArray[argY][argX]) {
                         mFieldAllyAreaSquaresArray[argY][argX] = false;
-                        mAllyAreaPoints -= abs(mFieldPointsArray[argY][argX]);
+                        mAllyScore.area -= abs(mFieldPointsArray[argY][argX]);
                     }
                     
-                    mAllyTilePoints += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
+                    mAllyScore.tile += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
                 }
                 else {
                     if (mFieldEnemyAreaSquaresArray[argY][argX]) {
                         mFieldEnemyAreaSquaresArray[argY][argX] = false;
-                        mEnemyAreaPoints -= abs(mFieldPointsArray[argY][argX]);
+                        mEnemyScore.area -= abs(mFieldPointsArray[argY][argX]);
                     }
                     
-                    mEnemyTilePoints += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
+                    mEnemyScore.tile += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
                 }
             }
             
@@ -935,41 +934,48 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::GOTO_LEFT_TOP;     // 左上を除去
+                    actNumber = AgentActNumbers::GOTO_LEFT_TOP;     // 左上を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    returnActNumber = AgentActNumbers::GOTO_TOP;          // 上を除去
+                    actNumber = AgentActNumbers::GOTO_TOP;          // 上を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::GOTO_RIGHT_TOP;    // 右上を除去
+                    actNumber = AgentActNumbers::GOTO_RIGHT_TOP;    // 右上を除去
                 }
             }
             else if (argY-argBeforeY == 0) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::GOTO_LEFT;         // 左を除去
+                    actNumber = AgentActNumbers::GOTO_LEFT;         // 左を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::GOTO_RIGHT;        // 右を除去
+                    actNumber = AgentActNumbers::GOTO_RIGHT;        // 右を除去
                 }
             }
             else if (argY-argBeforeY == 1) {
                 if (argX-argBeforeX == -1) {
-                    returnActNumber = AgentActNumbers::GOTO_LEFT_BOTTOM;  // 左下を除去
+                    actNumber = AgentActNumbers::GOTO_LEFT_BOTTOM;  // 左下を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    returnActNumber = AgentActNumbers::GOTO_BOTTOM;       // 下を除去
+                    actNumber = AgentActNumbers::GOTO_BOTTOM;       // 下を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    returnActNumber = AgentActNumbers::GOTO_RIGHT_BOTTOM; // 右下を除去
+                    actNumber = AgentActNumbers::GOTO_RIGHT_BOTTOM; // 右下を除去
                 }
             }
         }
     }
     
-    mAllyPoints = mAllyTilePoints + mAllyAreaPoints;
-    mEnemyPoints = mEnemyTilePoints + mEnemyAreaPoints;
+    // 行動の番号をメンバ配列に格納
+    // 味方エージェントの場合
+    if (mCurrentAgentID > 0) {
+        mAllyAgentsActNumbers[mCurrentAgentID-1] = actNumber;
+    }
+    // 相手エージェントの場合
+    else {
+        mEnemyAgentsActNumbers[-1*(mCurrentAgentID+1)] = actNumber;
+    }
     
-    return returnActNumber;
+    return actNumber;
 }
 
 /**
