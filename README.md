@@ -84,8 +84,8 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 - vector&lt;vector&lt;bool&gt;&gt; mFieldEnemyAreaSquaresArray   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
 - vector&lt;vector&lt;bool&gt;&gt; mFieldAreaSideLinesArray      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
   
-  vector&lt;int&gt; mAllyAgentsActNumbers              : 味方エージェントの行動の番号  
-  vector&lt;int&gt; mEnemyAgentsActNumbers             : 相手エージェントの行動の番号  
+- vector&lt;int&gt; mAllyAgentsActNumbers              : 味方エージェントの行動の番号  
+- vector&lt;int&gt; mEnemyAgentsActNumbers             : 相手エージェントの行動の番号  
     
 - Score mAllyScore                              : 味方チームの得点（合計点: mAllyScore.total, タイルポイント: mAllyScore.tile, 領域ポイント: mAllyScore.area）  
 - Score mEnemyScore                              : 相手チームの得点（合計点: mEnemyScore.total, タイルポイント: mEnemyScore.tile, 領域ポイント: mEnemyScore.area）  

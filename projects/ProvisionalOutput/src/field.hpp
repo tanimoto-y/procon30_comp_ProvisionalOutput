@@ -12,44 +12,6 @@ using namespace std;
 
 // フィールドクラス
 class Field {
-    // プライベートメンバ
-    vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
-    vector<vector<int>> mFieldStatusArray;              // フィールドの状況格納用
-    vector<vector<int>> mFieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
-    vector<vector<bool>> mFieldAllyAreaSquaresArray;    // 味方の領域の格納用
-    vector<vector<bool>> mFieldEnemyAreaSquaresArray;   // 相手の領域の格納用
-    vector<vector<bool>> mFieldAreaSideLinesArray;      // 領域を成す辺の格納用
-    
-    vector<int> mAllyAgentsActNumbers;              // 味方エージェントの行動の番号
-    vector<int> mEnemyAgentsActNumbers;             // 相手エージェントの行動の番号
-    
-    Score mAllyScore;                               // 味方チームの得点（合計得点、タイルポイント、領域ポイントを含む構造体）
-    Score mEnemyScore;                              // 相手チームの得点（合計得点、タイルポイント、領域ポイントを含む構造体）
-    
-    int mFieldSizeW, mFieldSizeH;                   // フィールドの大きさ
-    int mFieldLineLengthW, mFieldLineLengthH;       // フィールドの枠の長さ
-    int mFieldSquareSize;                           // フィールドの1マスあたりの大きさ（正方形）
-    
-    int mTotalTeamAgents;                           // 各チームのエージェントの総数
-    
-    int mFieldLeftmostPoint;                        // フィールドの描画範囲の左端の座標
-    int mFieldRightmostPoint;                       // フィールドの描画範囲の右端の座標
-    int mFieldTopmostPoint;                         // フィールドの描画範囲の上端の座標
-    int mFieldBottommostPoint;                      // フィールドの描画範囲の下端の座標
-    
-    bool mAllyTeamColor;                            // 味方チームの色（敵チームの色は!allyTeamColorで取得できる）
-    
-    Vec2 mCurrentSquarePosition = { -1, -1 };       // 選択されているマスの座標（選択されていなければ(-1, -1)）
-    int mCurrentAgentID = 0;                        // 選択されているマスにいるエージェントのID（選択されていなければ 0）
-    
-    bool mMousePressing = false;                    // マウスが押されている間はtrue
-    
-    Font mPointTextFont;                            // 点数表示用のフォント
-    Font mPointTextFontBold;                        // 点数表示用の太字フォント
-    Font mAgentIDTextFont;                          // エージェントID表示用のフォント
-    
-    int mBigPointsBorder;                           // 大きい点数の基準（この値を超えると太字で点数を表示する）
-    
 public:
     // コンストラクタ（初期化も行う）
     Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray, const Vec2 position, const bool argAllyTeamColor);
@@ -104,6 +66,44 @@ public:
     
     // フィールドの描画
     void draw();
+    
+private:
+    vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
+    vector<vector<int>> mFieldStatusArray;              // フィールドの状況格納用
+    vector<vector<int>> mFieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
+    vector<vector<bool>> mFieldAllyAreaSquaresArray;    // 味方の領域の格納用
+    vector<vector<bool>> mFieldEnemyAreaSquaresArray;   // 相手の領域の格納用
+    vector<vector<bool>> mFieldAreaSideLinesArray;      // 領域を成す辺の格納用
+    
+    vector<int> mAllyAgentsActNumbers;              // 味方エージェントの行動の番号
+    vector<int> mEnemyAgentsActNumbers;             // 相手エージェントの行動の番号
+    
+    Score mAllyScore;                               // 味方チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
+    Score mEnemyScore;                              // 相手チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
+    
+    int mFieldSizeW, mFieldSizeH;                   // フィールドの大きさ
+    int mFieldLineLengthW, mFieldLineLengthH;       // フィールドの枠の長さ
+    int mFieldSquareSize;                           // フィールドの1マスあたりの大きさ（正方形）
+    
+    int mTotalTeamAgents;                           // 各チームのエージェントの総数
+    
+    int mFieldLeftmostPoint;                        // フィールドの描画範囲の左端の座標
+    int mFieldRightmostPoint;                       // フィールドの描画範囲の右端の座標
+    int mFieldTopmostPoint;                         // フィールドの描画範囲の上端の座標
+    int mFieldBottommostPoint;                      // フィールドの描画範囲の下端の座標
+    
+    bool mAllyTeamColor;                            // 味方チームの色（敵チームの色は!allyTeamColorで取得できる）
+    
+    Vec2 mCurrentSquarePosition = { -1, -1 };       // 選択されているマスの座標（選択されていなければ(-1, -1)）
+    int mCurrentAgentID = 0;                        // 選択されているマスにいるエージェントのID（選択されていなければ 0）
+    
+    bool mMousePressing = false;                    // マウスが押されている間はtrue
+    
+    Font mPointTextFont;                            // 点数表示用のフォント
+    Font mPointTextFontBold;                        // 点数表示用の太字フォント
+    Font mAgentIDTextFont;                          // エージェントID表示用のフォント
+    
+    int mBigPointsBorder;                           // 大きい点数の基準（この値を超えると太字で点数を表示する）
 };
 
 #endif /* field_hpp */
