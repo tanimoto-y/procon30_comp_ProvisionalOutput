@@ -77,19 +77,18 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 
 ### Fieldクラス
 #### プライベート変数・配列
-- vector<vector<<int>>> mFieldPointsArray;              : フィールドの点数（setFieldで代入）  
-- vector<vector<<int>>> mFieldStatusArray;              : フィールドの状況（setFieldで代入）  
-- vector<vector<<int>>> mFieldAgentsIDArray;            : フィールド上のエージェントの場所とエージェントID（setFieldで設定）  
-- vector<vector<<bool>>> mFieldAllyAreaSquaresArray;    : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector<<bool>>> mFieldEnemyAreaSquaresArray;   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
-- vector<vector<<bool>>> mFieldAreaSideLinesArray;      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
+- vector&lt;vector&lt;int&gt;&gt; mFieldPointsArray              : フィールドの点数（setFieldで代入）  
+- vector&lt;vector&lt;int&gt;&gt; mFieldStatusArray              : フィールドの状況（setFieldで代入）  
+- vector&lt;vector&lt;int&gt;&gt; mFieldAgentsIDArray            : フィールド上のエージェントの場所とエージェントID番号（setFieldで設定）  
+- vector&lt;vector&lt;bool&gt;&gt; mFieldAllyAreaSquaresArray     : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector&lt;vector&lt;bool&gt;&gt; mFieldEnemyAreaSquaresArray   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
+- vector&lt;vector&lt;bool&gt;&gt; mFieldAreaSideLinesArray      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
   
-- int mAllyPoints                                 : 味方チームの合計得点（タイルポイント＋領域ポイント）  
-- int mEnemyPoints                                : 相手チームの合計得点（タイルポイント＋領域ポイント）  
-- int mAllyTilePoints                             : 味方チームのタイルポイント  
-- int mEnemyTilePoints                            : 相手チームのタイルポイント  
-- int mAllyAreaPoints                             : 相手チームの領域ポイント
-- int mEnemyAreaPoints                            : 相手チームの領域ポイント
+  vector&lt;int&gt; mAllyAgentsActNumbers              : 味方エージェントの行動の番号  
+  vector&lt;int&gt; mEnemyAgentsActNumbers             : 相手エージェントの行動の番号  
+    
+- Score mAllyScore                              : 味方チームの得点（合計点: mAllyScore.total, タイルポイント: mAllyScore.tile, 領域ポイント: mAllyScore.area）  
+- Score mEnemyScore                              : 相手チームの得点（合計点: mEnemyScore.total, タイルポイント: mEnemyScore.tile, 領域ポイント: mEnemyScore.area）  
   
 - int mFieldSizeW, mFieldSizeH                    : フィールドの大きさ（wは横、hは縦）  
 - int mFieldLineLengthW, mFieldLineLengthH        : フィールドの枠の長さ  
@@ -118,8 +117,8 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 #### Field::Field
 Fieldクラスのコンストラクタです。フィールドの初期化を行います。
   
-- const vector<vector<<int>>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector<<int>>> &argFieldStatusArray    : フィールドの状態を示す配列  
+- const vector&lt;vector&lt;int&gt;&gt; &argFieldPointsArray    : フィールドの得点の配列  
+- const vector&lt;vector&lt;int&gt;&gt; &argFieldStatusArray    : フィールドの状態を示す配列  
 - const Vec2 position                               : フィールドの大きさを示す配列（例：Vec2{10, 10}）  
 - const bool argAllyTeamColor                       : 味方チームの色（TeamColor::RED or TeamColor::BLUE）
     
@@ -129,8 +128,8 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 この関数は、基本的にFieldコンストラクタから呼び出されます。  
 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3  
   
-- const vector<vector<<int>>> &argFieldPointsArray    : フィールドの得点の配列  
-- const vector<vector<<int>>> &argFieldStatusArray    : フィールドの状態を示す配列
+- const vector&lt;vector&lt;int&gt;&gt; &argFieldPointsArray    : フィールドの得点の配列  
+- const vector&lt;vector&lt;int&gt;&gt; &argFieldStatusArray    : フィールドの状態を示す配列
     
 #### void Field::searchAreaPointsSide
 再帰関数です。  
@@ -138,7 +137,7 @@ IDはフィールドの左上から順に振り分けられ、味方のエージ
 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定します。  
 その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定します。  
   
-- vector<vector<bool>> argFieldMark     : フィールドの領域に認定したかどうか（一時的な配列）  
+- vector&lt;vector&lt;bool&gt;&gt; argFieldMark     : フィールドの領域に認定したかどうか（一時的な配列）  
 - const int argStartX                   : 領域探索の始点のマスのx座標  
 - const int argStartY                   : 領域探索の始点のマスのy座標  
 - const int argX                        : 現在探索中のマスのx座標  

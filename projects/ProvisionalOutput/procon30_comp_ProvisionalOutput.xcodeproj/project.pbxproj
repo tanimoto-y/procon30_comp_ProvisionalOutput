@@ -82,6 +82,7 @@
 		2CAAB0EA1EE663680000A06D /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libz.a; sourceTree = "<group>"; };
 		2CC7F9841F4592DA0071A239 /* langelscript.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = langelscript.a; sourceTree = "<group>"; };
 		2CC7F9871F45930A0071A239 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		4B44FC4B22733B3B0059CEDA /* header.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = header.hpp; sourceTree = "<group>"; };
 		4B7653E7226880BE00517CA8 /* field.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = field.cpp; sourceTree = "<group>"; };
 		4B7653E8226880BE00517CA8 /* field.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = field.hpp; sourceTree = "<group>"; };
 		4B7653EA226A0FD300517CA8 /* node.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = node.cpp; sourceTree = "<group>"; };
@@ -161,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				2C1778991CE0AA7C00BB8AD0 /* Main.cpp */,
+				4B44FC4B22733B3B0059CEDA /* header.hpp */,
 				4B7653E8226880BE00517CA8 /* field.hpp */,
 				4B7653E7226880BE00517CA8 /* field.cpp */,
 				4B7653EB226A0FD300517CA8 /* node.hpp */,

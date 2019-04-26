@@ -1,5 +1,3 @@
-#include <Siv3D.hpp> // OpenSiv3D v0.3.1
-#include <stdio.h>
 #include "field.hpp"
 
 using namespace std;
