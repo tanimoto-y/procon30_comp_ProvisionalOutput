@@ -55,6 +55,12 @@ public:
     // タイル点数の表示
     void printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
+    // タイル除去
+    void removeTile(const int argX, const int argY, const int argTileStatus);
+    
+    // タイル設置
+    void putTile(const int argX, const int argY, const int argTileStatus);
+    
     // エージェントの行動
     int agentMovement(int argX, int argY, int argBeforeX, int argBeforeY);
     

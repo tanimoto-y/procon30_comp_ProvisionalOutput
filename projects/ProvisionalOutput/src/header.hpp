@@ -20,7 +20,7 @@
 
 #define DIRECTIONS                  9       // エージェントが移動できる方向の数（「とどまる」も含む）
 
-/*---------------- グローバル変数 ----------------*/
+/*---------------- グローバル定数 ----------------*/
 // エージェントが移動できる座標
 const Vec2 gMoveDirections[9] {
     {-1, -1}, { 0, -1}, { 1, -1},
@@ -74,16 +74,6 @@ namespace TileStatus {
         ALLY    =  1,
         NONE    =  0,
         ENEMY   = -1,
-    };
-}
-
-// 領域の状態を示す値
-namespace AreaStatus {
-    enum Type {
-        NONE    = 0,
-        ALLY    = 1,
-        ENEMY   = 2,
-        BOTH    = 3,
     };
 }
 

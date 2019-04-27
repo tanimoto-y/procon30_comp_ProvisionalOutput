@@ -530,14 +530,11 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
     
     // 領域を探索する対象のチーム
     // 領域の解除処理であれば、解除する対象のチーム
-    int beAreaSquaresStatus = AreaStatus::NONE;
     Team::Type team;
     if (argBeTileStatus == TileStatus::ALLY) {
-        beAreaSquaresStatus = AreaStatus::ALLY;
         team = Team::ALLY;
     }
     else {
-        beAreaSquaresStatus = AreaStatus::ENEMY;
         team = Team::ENEMY;
     }
     
@@ -734,9 +731,170 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
 }
 
 /**
+ Field::removeTile:
+ タイルを除去する。
+ また、領域を成すタイルを除去する場合は、
+ 除去後に領域が成立するか確認するため、searchAreaPointsSquare関数を呼び出す。
+ 
+ @param argX            タイルを除去するマスのx座標
+ @param argY            タイルを除去するマスのy座標
+ @param argTileStatus   タイルを除去するチームのTileStatus（除去されるチームではない）
+ */
+void Field::removeTile(const int argX, const int argY, const int argTileStatus) {
+    mFieldStatusArray[argY][argX] = 0;
+    
+    // 相手から点数を引く
+    if (mCurrentAgentID > 0) {
+        mEnemyScore.tile -= mFieldPointsArray[argY][argX];
+    }
+    else {
+        mAllyScore.tile -= mFieldPointsArray[argY][argX];
+    }
+    
+    // 相手チームの領域に隣接していたら、相手チームの領域を再計算
+    for (int i = 0; i < 4; i++) {
+        if (argX+gSearchTileDirections[i].x < 0 || argY+gSearchTileDirections[i].y < 0 ||
+            argX+gSearchTileDirections[i].x > mFieldSizeW-1 || argY+gSearchTileDirections[i].y > mFieldSizeH-1) {
+            continue;
+        }
+        
+        // 領域の辺を成すタイルなら、除去後も領域が成立するか確認
+        // 成立しなければ、領域を解除する
+        if ((argTileStatus == TileStatus::ENEMY && mFieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
+            (argTileStatus == TileStatus::ALLY && mFieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
+            if (mFieldAreaSideLinesArray[argY][argX]) {
+                
+                // 味方チームのエージェントが相手チームのタイルを除去するとき
+                if (mCurrentAgentID > 0) {
+                    vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
+                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, true);
+                    
+                    if (!areThereArea) {
+                        // 領域ポイントに反映
+                        for (int j = 0; j < mFieldSizeH; j++) {
+                            for (int k = 0; k < mFieldSizeW; k++) {
+                                if (mFieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
+                                    mEnemyScore.area -= abs(mFieldPointsArray[j][k]);
+                                }
+                            }
+                        }
+                        
+                        mFieldEnemyAreaSquaresArray = areaSquares;
+                        
+                        // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
+                        // 成立するなら領域を解除しない
+                        bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ENEMY, false);
+                        
+                        if (areaRecheck) {
+                            // 領域ポイントに反映
+                            for (int j = 0; j < mFieldSizeH; j++) {
+                                for (int k = 0; k < mFieldSizeW; k++) {
+                                    if (!mFieldEnemyAreaSquaresArray[j][k] && areaSquares[j][k]) {
+                                        mEnemyScore.area += abs(mFieldPointsArray[j][k]);
+                                    }
+                                }
+                            }
+                            
+                            mFieldEnemyAreaSquaresArray = areaSquares;
+                        }
+                    }
+                }
+                // 相手チームのエージェントが味方チームのタイルを除去するとき
+                else if (mCurrentAgentID < 0) {
+                    vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
+                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, true);
+                    
+                    if (!areThereArea) {
+                        // 領域ポイントに反映
+                        for (int j = 0; j < mFieldSizeH; j++) {
+                            for (int k = 0; k < mFieldSizeW; k++) {
+                                if (mFieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
+                                    mAllyScore.area -= abs(mFieldPointsArray[j][k]);
+                                }
+                            }
+                        }
+                        
+                        mFieldAllyAreaSquaresArray = areaSquares;
+                        
+                        // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
+                        // 成立するなら領域を解除しない
+                        bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ALLY, false);
+                        
+                        if (areaRecheck) {
+                            // 領域ポイントに反映
+                            for (int j = 0; j < mFieldSizeH; j++) {
+                                for (int k = 0; k < mFieldSizeW; k++) {
+                                    if (!mFieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
+                                        mAllyScore.area += abs(mFieldPointsArray[j][k]);
+                                    }
+                                }
+                            }
+                            
+                            mFieldAllyAreaSquaresArray = areaSquares;
+                        }
+                    }
+                }
+            }
+            else {
+                if (mCurrentAgentID > 0) {
+                    vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
+                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, false);
+                    
+                    if (areThereArea) {
+                        mFieldAllyAreaSquaresArray = areaSquares;
+                    }
+                }
+                else if (mCurrentAgentID < 0) {
+                    vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
+                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
+                    
+                    if (areThereArea) {
+                        mFieldEnemyAreaSquaresArray = areaSquares;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ Field::putTile:
+ タイルを置く。
+ また、領域ポイントの存在を確認するため、searchAreaPoints関数を呼び出す。
+
+ @param argX            タイルを置くマスのx座標
+ @param argY            タイルを置くマスのy座標
+ @param argTileStatus   タイルを置くチームのTileStatus
+ */
+void Field::putTile(const int argX, const int argY, const int argTileStatus) {
+    mFieldStatusArray[argY][argX] = argTileStatus;
+        
+    if (mCurrentAgentID > 0) {
+        if (mFieldAllyAreaSquaresArray[argY][argX]) {
+            mFieldAllyAreaSquaresArray[argY][argX] = false;
+            mAllyScore.area -= abs(mFieldPointsArray[argY][argX]);
+        }
+            
+        mAllyScore.tile += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
+    }
+    else {
+        if (mFieldEnemyAreaSquaresArray[argY][argX]) {
+            mFieldEnemyAreaSquaresArray[argY][argX] = false;
+            mEnemyScore.area -= abs(mFieldPointsArray[argY][argX]);
+        }
+            
+        mEnemyScore.tile += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
+    }
+    
+    // 領域ポイントができているか確認
+    searchAreaPoints(argX, argY);
+}
+
+/**
  Field::agenrMovement:
  エージェントの行動
- エージェントの移動、タイルの除去などを行う。
+ エージェントの移動、タイル設置(Field::putTile関数内)、タイルの除去(Field::removeTile関数内)などを行う。
+ タイル設置時には、領域が成立するかも確認する(Field::searchAreaPoints関数内)。
  相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
  最後に、エージェントの行動の番号を返す。
  
@@ -747,126 +905,15 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
  @return エージェントの行動の番号（0~16）　field.hppのAgentActNumbersに定義済み
  */
 int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
-    int team = mFieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチーム
+    int beTileStatus = mFieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチーム
     int actNumber = 0;      // 行動の番号
     
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
+        // 相手の領域を成すタイルなら、除去後にその領域が成立するか確認
         if (mFieldStatusArray[argY][argX] == (-1)*mFieldStatusArray[argBeforeY][argBeforeX] && mFieldAgentsIDArray[argY][argX] == 0) {
-            mFieldStatusArray[argY][argX] = 0;
-            
-            // 相手から点数を引く
-            if (mCurrentAgentID > 0) {
-                mEnemyScore.tile -= mFieldPointsArray[argY][argX];
-            }
-            else {
-                mAllyScore.tile -= mFieldPointsArray[argY][argX];
-            }
-            
-            // 相手チームの領域に隣接していたら、相手チームの領域を再計算
-            for (int i = 0; i < 4; i++) {
-                if (argX+gSearchTileDirections[i].x < 0 || argY+gSearchTileDirections[i].y < 0 ||
-                    argX+gSearchTileDirections[i].x > mFieldSizeW-1 || argY+gSearchTileDirections[i].y > mFieldSizeH-1) {
-                    continue;
-                }
-                
-                // 領域の辺を成すタイルなら、除去後も領域が成立するか確認
-                // 成立しなければ、領域を解除する
-                if ((team == TileStatus::ENEMY && mFieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
-                    (team == TileStatus::ALLY && mFieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
-                    if (mFieldAreaSideLinesArray[argY][argX]) {
-                        
-                        // 味方チームのエージェントが相手チームのタイルを除去するとき
-                        if (mCurrentAgentID > 0) {
-                            vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, true);
-                            
-                            if (!areThereArea) {
-                                // 領域ポイントに反映
-                                for (int j = 0; j < mFieldSizeH; j++) {
-                                    for (int k = 0; k < mFieldSizeW; k++) {
-                                        if (mFieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                            mEnemyScore.area -= abs(mFieldPointsArray[j][k]);
-                                        }
-                                    }
-                                }
-                                
-                                mFieldEnemyAreaSquaresArray = areaSquares;
-                                
-                                // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
-                                // 成立するなら領域を解除しない
-                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ENEMY, false);
-                                
-                                if (areaRecheck) {
-                                    // 領域ポイントに反映
-                                    for (int j = 0; j < mFieldSizeH; j++) {
-                                        for (int k = 0; k < mFieldSizeW; k++) {
-                                            if (!mFieldEnemyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                                mEnemyScore.area += abs(mFieldPointsArray[j][k]);
-                                            }
-                                        }
-                                    }
-                                    
-                                    mFieldEnemyAreaSquaresArray = areaSquares;
-                                }
-                            }
-                        }
-                        // 相手チームのエージェントが味方チームのタイルを除去するとき
-                        else if (mCurrentAgentID < 0) {
-                            vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, true);
-                            
-                            if (!areThereArea) {
-                                // 領域ポイントに反映
-                                for (int j = 0; j < mFieldSizeH; j++) {
-                                    for (int k = 0; k < mFieldSizeW; k++) {
-                                        if (mFieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                            mAllyScore.area -= abs(mFieldPointsArray[j][k]);
-                                        }
-                                    }
-                                }
-                                
-                                mFieldAllyAreaSquaresArray = areaSquares;
-                                
-                                // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
-                                // 成立するなら領域を解除しない
-                                bool areaRecheck = searchAreaPointsSquares(areaSquares, argX, argY, TileStatus::ALLY, false);
-                                
-                                if (areaRecheck) {
-                                    // 領域ポイントに反映
-                                    for (int j = 0; j < mFieldSizeH; j++) {
-                                        for (int k = 0; k < mFieldSizeW; k++) {
-                                            if (!mFieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                                mAllyScore.area += abs(mFieldPointsArray[j][k]);
-                                            }
-                                        }
-                                    }
-                                    
-                                    mFieldAllyAreaSquaresArray = areaSquares;
-                                }
-                            }
-                        }
-                    }
-                    else {
-                        if (mCurrentAgentID > 0) {
-                            vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, false);
-                            
-                            if (areThereArea) {
-                                mFieldAllyAreaSquaresArray = areaSquares;
-                            }
-                        }
-                        else if (mCurrentAgentID < 0) {
-                            vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
-                            bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
-                            
-                            if (areThereArea) {
-                                mFieldEnemyAreaSquaresArray = areaSquares;
-                            }
-                        }
-                    }
-                }
-            }
+            // タイルの除去（相手の領域を成すタイルなら、除去後にその領域が成立するか確認）
+            removeTile(argX, argY, beTileStatus);
             
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
@@ -901,35 +948,19 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             }
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
+        // 領域が成立するなら領域の設定も行う
         else if (mFieldAgentsIDArray[argY][argX] == 0) {
             mCurrentSquarePosition = {argX, argY};
             
-            if (mFieldStatusArray[argY][argX] != mFieldStatusArray[argBeforeY][argBeforeX]) {
-                mFieldStatusArray[argY][argX] = mFieldStatusArray[argBeforeY][argBeforeX];
-                
-                if (mCurrentAgentID > 0) {
-                    if (mFieldAllyAreaSquaresArray[argY][argX]) {
-                        mFieldAllyAreaSquaresArray[argY][argX] = false;
-                        mAllyScore.area -= abs(mFieldPointsArray[argY][argX]);
-                    }
-                    
-                    mAllyScore.tile += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
-                }
-                else {
-                    if (mFieldEnemyAreaSquaresArray[argY][argX]) {
-                        mFieldEnemyAreaSquaresArray[argY][argX] = false;
-                        mEnemyScore.area -= abs(mFieldPointsArray[argY][argX]);
-                    }
-                    
-                    mEnemyScore.tile += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
-                }
+            // タイルを置く処理（まだタイルが置かれていない場合のみ）
+            // 領域が成立するなら領域の設定も行う
+            if (mFieldStatusArray[argY][argX] != beTileStatus) {
+                putTile(argX, argY, beTileStatus);
             }
             
+            // エージェントの位置も移動させる
             mFieldAgentsIDArray[argY][argX] = mCurrentAgentID;
             mFieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
-            
-            // 領域ポイントができているか確認
-            searchAreaPoints(argX, argY);
             
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {

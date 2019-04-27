@@ -38,6 +38,93 @@ Windowsの場合はVisual Studio 2019を使用してください。
 #### Visual Studioでビルドする場合
 （準備中）
 
+## 定数・構造体・名前空間の説明
+定数と構造体はheader.hppで定義しています。  
+
+### 定数: ウィンドウの大きさ関連
+#### WINDOW_SIZE_W
+ウィンドウの横幅です。
+#### WINDOW_SIZE_H
+ウィンドウの縦幅です。
+
+### 定数: フィールドの大きさ・幅関連
+#### FIELD_LINE_MAX_LENGTH
+フィールドの枠の最大長です。  
+フィールドはこの長さに合わせて描画します。
+#### FIELD_SIZE_MAX
+フィールドの一列の最大のマスの数です。
+
+### 定数: フォントサイズ関連
+#### POINT_TEXT_FONT_SIZE
+点数表示用のフォントの、フィールドの1マスあたりの大きさから引く数値です。
+#### POINT_TEXT_BIG_FONT_SIZE
+点数表示用の大きいフォントの、フィールドの1マスあたりの大きさから引く数値です。
+#### AGENT_ID_TEXT_FONT_SIZE
+エージェントID表示用のフォントの、フィールドの1マスあたりの大きさから引く数値です。
+
+### 定数: 行動関連
+#### DIRECTIONS
+エージェントが移動できる方向の総数です。「とどまる」も含みます。
+
+### グローバル定数: 周囲のマスの座標関連
+#### const Vec2 gMoveDirections[9]
+エージェントが移動できる座標を格納しています。
+#### const Vec2 gSearchTileDirections[4]
+周囲4方向の座標を格納しています。
+
+### 構造体: 得点
+#### struct Score
+得点を保持するための構造体です。  
+- int tile : タイルポイント
+- int area: 領域ポイント
+- int total(): 合計得点（tile + area）を返す関数
+
+### 名前空間: チーム関連
+チームや色、タイルの色の状態を示す番号を格納しています。
+使用例）TeamColorのBLUEの値を取得したい場合 : TeamColor::BLUE
+#### TeamColor
+チームの色を示す番号を格納しています。  
+- BLUE : 青チーム  
+- RED : 赤チーム
+#### Team
+チーム自体を示す番号を格納しています。  
+ここで言うチームとは、味方か相手のどちらかということを指します。  
+- ALLY : 味方チーム  
+- ENEMY : 相手チーム  
+#### TileStatus
+タイルの状態を示す番号を格納しています。  
+- ALLY : 味方チームのタイル  
+- NONE : どちらのチームのタイルでもない（白いタイル）  
+- ENEMY : 相手チームのタイル
+#### AreaStatus
+特定のマスがどのチームの領域であるかを示す番号を格納しています。  
+- NONE : どちらのチームの領域でもない
+
+### 名前空間: エージェントの行動の番号
+#### AgentActNumbers
+エージェントの行動の番号を格納しています。  
+使用例）右に移動 : AgentActNumbers::GOTO_RIGHT  
+番号は以下の規定に従います:  
+- 動きなし : NONE = 0  
+  
+- 移動 左上 : GOTO\_LEFT\_TOP = 1  
+- 移動 上 : GOTO_TOP = 2  
+- 移動 右上 : GOTO\_RIGHT\_TOP = 3  
+- 移動 右 : GOTO_RIGHT = 4  
+- 移動 右下 : GOTO\_RIGHT\_BOTTOM = 5  
+- 移動 下 : GOTO_BOTTOM = 6  
+- 移動 左下 : GOTO\_LEFT\_BOTTOM = 7  
+- 移動 左 : GOTO_LEFT = 8  
+  
+- 除去 左上 : REMOVE\_LEFT\_TOP = 9  
+- 除去 上 : REMOVE_TOP = 10  
+- 除去 右上 : REMOVE\_RIGHT\_TOP = 11  
+- 除去 右 : REMOVE_RIGHT = 12  
+- 除去 右下 : REMOVE\_RIGHT\_BOTTOM = 13  
+- 除去 下 : REMOVE_BOTTOM = 14  
+- 除去 左下 : REMOVE\_LEFT\_BOTTOM = 15  
+- 除去 左 : REMOVE_LEFT = 16
+
 ## 各変数・関数の説明
 ここでは、よく使う変数や関数の説明を書きます。  
 詳しいことはソースコードにドキュメントコメントで書いてあります。
