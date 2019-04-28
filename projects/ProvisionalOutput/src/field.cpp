@@ -63,8 +63,8 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     mFieldPointsArray = argFieldPointsArray;    // フィールドの得点
     mFieldStatusArray = argFieldStatusArray;    // フィールドの状況
     
-    mAllyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::NONE);  // 味方エージェントの行動番号の初期化
-    mEnemyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::NONE); // 相手エージェントの行動番号の初期化
+    mAllyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::STAY);  // 味方エージェントの行動番号の初期化
+    mEnemyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::STAY); // 相手エージェントの行動番号の初期化
     
     // 得点の初期化
     mAllyScore  = Score{0, 0};
@@ -918,13 +918,13 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
                 if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::REMOVE_LEFT_TOP;     // 左上を除去
+                    actNumber = AgentActNumbers::REMOVE_UP_LEFT;      // 左上を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::REMOVE_TOP;          // 上を除去
+                    actNumber = AgentActNumbers::REMOVE_UP;           // 上を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::REMOVE_RIGHT_TOP;    // 右上を除去
+                    actNumber = AgentActNumbers::REMOVE_UP_RIGHT;     // 右上を除去
                 }
             }
             else if (argY-argBeforeY == 0) {
@@ -937,13 +937,13 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             }
             else if (argY-argBeforeY == 1) {
                 if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::REMOVE_LEFT_BOTTOM;  // 左下を除去
+                    actNumber = AgentActNumbers::REMOVE_DOWN_LEFT;    // 左下を除去
                 }
                 else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::REMOVE_BOTTOM;       // 下を除去
+                    actNumber = AgentActNumbers::REMOVE_DOWN;         // 下を除去
                 }
                 else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::REMOVE_RIGHT_BOTTOM; // 右下を除去
+                    actNumber = AgentActNumbers::REMOVE_DOWN_RIGHT;   // 右下を除去
                 }
             }
         }
@@ -965,32 +965,32 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
                 if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GOTO_LEFT_TOP;     // 左上を除去
+                    actNumber = AgentActNumbers::GO_UP_LEFT;        // 左上へ移動
                 }
                 else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::GOTO_TOP;          // 上を除去
+                    actNumber = AgentActNumbers::GO_UP;             // 上へ移動
                 }
                 else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GOTO_RIGHT_TOP;    // 右上を除去
+                    actNumber = AgentActNumbers::GO_UP_RIGHT;       // 右上へ移動
                 }
             }
             else if (argY-argBeforeY == 0) {
                 if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GOTO_LEFT;         // 左を除去
+                    actNumber = AgentActNumbers::GO_LEFT;           // 左へ移動
                 }
                 else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GOTO_RIGHT;        // 右を除去
+                    actNumber = AgentActNumbers::GO_RIGHT;          // 右へ移動
                 }
             }
             else if (argY-argBeforeY == 1) {
                 if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GOTO_LEFT_BOTTOM;  // 左下を除去
+                    actNumber = AgentActNumbers::GO_DOWN_LEFT;      // 左下へ移動
                 }
                 else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::GOTO_BOTTOM;       // 下を除去
+                    actNumber = AgentActNumbers::GO_DOWN;           // 下へ移動
                 }
                 else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GOTO_RIGHT_BOTTOM; // 右下を除去
+                    actNumber = AgentActNumbers::GO_DOWN_RIGHT;     // 右下へ移動
                 }
             }
         }

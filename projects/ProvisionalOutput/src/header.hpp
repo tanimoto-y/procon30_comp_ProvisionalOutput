@@ -80,24 +80,24 @@ namespace TileStatus {
 // エージェントの行動の番号
 namespace AgentActNumbers {
     enum Type {
-        NONE                = 0,    // 動きなし
+        STAY                = 0,    // 動きなし
         
-        GOTO_LEFT_TOP       = 1,    // 移動: 左上
-        GOTO_TOP            = 2,    // 移動: 上
-        GOTO_RIGHT_TOP      = 3,    // 移動: 右上
-        GOTO_RIGHT          = 4,    // 移動: 右
-        GOTO_RIGHT_BOTTOM   = 5,    // 移動: 右下
-        GOTO_BOTTOM         = 6,    // 移動: 下
-        GOTO_LEFT_BOTTOM    = 7,    // 移動: 左下
-        GOTO_LEFT           = 8,    // 移動: 左
+        GO_UP_LEFT          = 1,    // 移動: 左上
+        GO_UP               = 2,    // 移動: 上
+        GO_UP_RIGHT         = 3,    // 移動: 右上
+        GO_RIGHT            = 4,    // 移動: 右
+        GO_DOWN_RIGHT       = 5,    // 移動: 右下
+        GO_DOWN             = 6,    // 移動: 下
+        GO_DOWN_LEFT        = 7,    // 移動: 左下
+        GO_LEFT             = 8,    // 移動: 左
         
-        REMOVE_LEFT_TOP     = 9,    // 除去: 左上
-        REMOVE_TOP          = 10,   // 除去: 上
-        REMOVE_RIGHT_TOP    = 11,   // 除去: 右上
+        REMOVE_UP_LEFT      = 9,    // 除去: 左上
+        REMOVE_UP           = 10,   // 除去: 上
+        REMOVE_UP_RIGHT     = 11,   // 除去: 右上
         REMOVE_RIGHT        = 12,   // 除去: 右
-        REMOVE_RIGHT_BOTTOM = 13,   // 除去: 右下
-        REMOVE_BOTTOM       = 14,   // 除去: 下
-        REMOVE_LEFT_BOTTOM  = 15,   // 除去: 左下
+        REMOVE_DOWN_RIGHT   = 13,   // 除去: 右下
+        REMOVE_DOWN         = 14,   // 除去: 下
+        REMOVE_DOWN_LEFT    = 15,   // 除去: 左下
         REMOVE_LEFT         = 16,   // 除去: 左
     };
 }

@@ -11,7 +11,7 @@ packaged as SVG and JS file types.
 
 # Fonts: SIL OFL 1.1 License (https://scripts.sil.org/OFL)
 In the Font Awesome Free download, the SIL OLF license applies to all icons
-packaged as web and desktop font files.
+packaged as web and deskFRONT font files.
 
 # Code: MIT License (https://opensource.org/licenses/MIT)
 In the Font Awesome Free download, the MIT license applies to all non-font and

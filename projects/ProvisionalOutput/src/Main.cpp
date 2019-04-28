@@ -2,35 +2,23 @@
 
 using namespace std;
 
-#define WINDOW_SIZE_W               1280    // ウィンドウの横幅
-#define WINDOW_SIZE_H               720     // ウィンドウの縦幅
-
-#define FIELD_LINE_MAX_LENGTH       700     // フィールドの枠の最大長
-#define FIELD_SIZE_MAX              20      // フィールドの1列の最大のマスの数
-
-#define POINT_TEXT_FONT_SIZE        40      // 点数表示用のフォントのサイズ（フィールドの1マスあたりの大きさから引く数値）
-#define POINT_TEXT_BIG_FONT_SIZE    30      // 点数表示用の大きいフォントのサイズ（フィールドの1マスあたりの大きさから引く数値）
-#define AGENT_ID_TEXT_FONT_SIZE     55      // エージェントID表示用のフォントのサイズ（フィールドの1マスあたりの大きさから引く数値）
-
-#define DIRECTIONS                  9       // エージェントが移動できる方向の数（「とどまる」も含む）
-
 /**
  centerText:
  引数で指定した座標の中央に文字を表示する関数。
  文字列(String)型用
  
  @param argStr          表示する文字列
- @param argLeftTopX     左上のx座標
- @param argLeftTopY     左上のy座標
+ @param argLeftFRONTX     左上のx座標
+ @param argLeftFRONTY     左上のy座標
  @param argRightBottomX 右下のx座標
  @param argRightBottomY 右下のy座標
  @param argFont         表示に使うフォントのポインタ
  @param argColor        文字の色
  */
-void centerText(const String argStr, const int argLeftTopX, const int argLeftTopY, const int argRightBottomX, const int argRightBottomY, const Font& argFont, const Color argColor) {
+void centerText(const String argStr, const int argLeftFRONTX, const int argLeftFRONTY, const int argRightBottomX, const int argRightBottomY, const Font& argFont, const Color argColor) {
     unsigned long int textLength = argStr.length();
     
-    argFont(argStr).draw(argLeftTopX+(argRightBottomX-argLeftTopX)/2-textLength*argFont.fontSize()/3, argLeftTopY+(argRightBottomY-argLeftTopY)/2-argFont.fontSize()/2, argColor);
+    argFont(argStr).draw(argLeftFRONTX+(argRightBottomX-argLeftFRONTX)/2-textLength*argFont.fontSize()/3, argLeftFRONTY+(argRightBottomY-argLeftFRONTY)/2-argFont.fontSize()/2, argColor);
 }
 /**
  centerText:
@@ -38,17 +26,17 @@ void centerText(const String argStr, const int argLeftTopX, const int argLeftTop
  数値(int)型用
  
  @param argInt          表示する数値
- @param argLeftTopX     左上のx座標
- @param argLeftTopY     左上のy座標
+ @param argLeftFRONTX     左上のx座標
+ @param argLeftFRONTY     左上のy座標
  @param argRightBottomX 右下のx座標
  @param argRightBottomY 右下のy座標
  @param argFont         表示に使うフォントのポインタ
  @param argColor        文字の色
  */
-void centerText(const int argInt, const int argLeftTopX, const int argLeftTopY, const int argRightBottomX, const int argRightBottomY, const Font& argFont, const Color argColor) {
+void centerText(const int argInt, const int argLeftFRONTX, const int argLeftFRONTY, const int argRightBottomX, const int argRightBottomY, const Font& argFont, const Color argColor) {
     unsigned long int textLength = to_string(argInt).length();
     
-    argFont(argInt).draw(argLeftTopX+(argRightBottomX-argLeftTopX)/2-textLength*argFont.fontSize()/3, argLeftTopY+(argRightBottomY-argLeftTopY)/2-argFont.fontSize()/2, argColor);
+    argFont(argInt).draw(argLeftFRONTX+(argRightBottomX-argLeftFRONTX)/2-textLength*argFont.fontSize()/3, argLeftFRONTY+(argRightBottomY-argLeftFRONTY)/2-argFont.fontSize()/2, argColor);
 }
 
 /**

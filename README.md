@@ -105,24 +105,24 @@ Windowsの場合はVisual Studio 2019を使用してください。
 エージェントの行動の番号を格納しています。  
 使用例）右に移動 : AgentActNumbers::GOTO_RIGHT  
 番号は以下の規定に従います:  
-- 動きなし : NONE = 0  
+- とどまる : STAY = 0  
   
-- 移動 左上 : GOTO\_LEFT\_TOP = 1  
-- 移動 上 : GOTO_TOP = 2  
-- 移動 右上 : GOTO\_RIGHT\_TOP = 3  
-- 移動 右 : GOTO_RIGHT = 4  
-- 移動 右下 : GOTO\_RIGHT\_BOTTOM = 5  
-- 移動 下 : GOTO_BOTTOM = 6  
-- 移動 左下 : GOTO\_LEFT\_BOTTOM = 7  
-- 移動 左 : GOTO_LEFT = 8  
+- 移動 左上 : GO\_UP\_LEFT = 1  
+- 移動 上 : GO_UP = 2  
+- 移動 右上 : GO\_UP\_RIGHT = 3  
+- 移動 右 : GO_RIGHT = 4  
+- 移動 右下 : GO\_DOWN\_RIGHT = 5  
+- 移動 下 : GO_DOWN = 6  
+- 移動 左下 : GO\_DOWN\_LEFT = 7  
+- 移動 左 : GO_LEFT = 8  
   
-- 除去 左上 : REMOVE\_LEFT\_TOP = 9  
-- 除去 上 : REMOVE_TOP = 10  
-- 除去 右上 : REMOVE\_RIGHT\_TOP = 11  
+- 除去 左上 : REMOVE\_UP\_LEFT = 9  
+- 除去 上 : REMOVE_UP = 10  
+- 除去 右上 : REMOVE\_UP\_RIGHT = 11  
 - 除去 右 : REMOVE_RIGHT = 12  
-- 除去 右下 : REMOVE\_RIGHT\_BOTTOM = 13  
-- 除去 下 : REMOVE_BOTTOM = 14  
-- 除去 左下 : REMOVE\_LEFT\_BOTTOM = 15  
+- 除去 右下 : REMOVE\_DOWN\_RIGHT = 13  
+- 除去 下 : REMOVE_DOWN = 14  
+- 除去 左下 : REMOVE\_DOWN\_LEFT = 15  
 - 除去 左 : REMOVE_LEFT = 16
 
 ## 各変数・関数の説明
