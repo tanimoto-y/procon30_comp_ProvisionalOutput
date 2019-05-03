@@ -6,6 +6,8 @@
 ## 動作確認環境
 - macOS 10.14 mojave
   - Xcode 10.2.1
+- Windows 10
+  - Visual Studio 2019
 
 ## 使用環境
 - C++
@@ -25,7 +27,13 @@ https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8
 2. ダウンロードが完了したら、zipファイルを展開し、libフォルダとincludeフォルダをローカルリポジトリのフォルダ`procon30_comp_ProvisionalOutput`にコピーします。（examplesフォルダは不要）
 
 #### Windowsの場合
-（準備中）
+1. Visual Studio 2019 Communityのインストーラをダウンロードします。
+https://visualstudio.microsoft.com/ja/downloads/
+2. インストーラを起動して、「C++ によるデスクトップ開発」を選択し、インストールします。
+3. インストールが完了したら、OpenSiv3D SDKをダウンロードし、インストールします。
+  https://siv3d.jp/downloads/Siv3D/OpenSiv3D(0.3.2)Installer.exe
+
+参考 : https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8B%E6%BA%96%E5%82%99_(Windows)
 
 ### ビルド方法
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
@@ -33,10 +41,11 @@ Windowsの場合はVisual Studio 2019を使用してください。
 
 #### Xcodeでビルドする場合
 1. `procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/ProvisionalOutput.xcodeproj`をXcodeで開く。
-2. 画面左上の再生ボタンのようなボタンを押す。
+2. 画面左上の▶を押す。
 
 #### Visual Studioでビルドする場合
-（準備中）
+1. `procon30_comp_ProvisionalOutput/for_VisualStudio/procon30_comp_ProvisionalOutput.sln`をVisual Studioで開く。
+2. CtrlとF5を同時に押すか、または画面上部の「▶ローカル Windowsデバッガー」を押す。
 
 ## 定数・構造体・名前空間の説明
 定数と構造体はheader.hppで定義しています。  
