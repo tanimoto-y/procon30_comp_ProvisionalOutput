@@ -22,10 +22,9 @@
 
 /*---------------- グローバル定数 ----------------*/
 // エージェントが移動できる座標
+// 時計回り
 const Vec2 gMoveDirections[9] {
-    {-1, -1}, { 0, -1}, { 1, -1},
-    {-1,  0}, { 0,  0}, { 1,  0},
-    {-1,  1}, { 0,  1}, { 1,  1}
+    {-1, -1}, { 0, -1}, { 1, -1}, { 1,  0}, { 1,  1}, { 0,  1}, {-1,  1}, {-1,  0}, { 0,  0}
 };
 
 // 周囲4方向（上下左右）の座標
@@ -50,6 +49,26 @@ typedef struct Score {
         return tile + area;
     }
 } Score;
+
+/**
+ Score:
+ フィールドの情報格納用の構造体。
+ 
+ @var fieldPointsArray              フィールドの点数格納用
+ @var fieldStatusArray              フィールドの状況格納用
+ @var fieldAgentsIDArray            フィールド上のエージェントの場所の格納用
+ @var fieldAllyAreaSquaresArray     味方の領域の格納用
+ @var fieldEnemyAreaSquaresArray    相手の領域の格納用
+ @var fieldAreaSideLinesArray       領域を成す辺の格納用
+ */
+typedef struct fieldDataStruct {
+    vector<vector<int>> fieldPointsArray;              // フィールドの点数格納用
+    vector<vector<int>> fieldStatusArray;              // フィールドの状況格納用
+    vector<vector<int>> fieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
+    vector<vector<bool>> fieldAllyAreaSquaresArray;    // 味方の領域の格納用
+    vector<vector<bool>> fieldEnemyAreaSquaresArray;   // 相手の領域の格納用
+    vector<vector<bool>> fieldAreaSideLinesArray;      // 領域を成す辺の格納用
+} fieldDataStruct;
 
 /*-------------------- 名前空間 --------------------*/
 // チームの色

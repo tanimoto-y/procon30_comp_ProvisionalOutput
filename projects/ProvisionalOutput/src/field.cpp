@@ -60,11 +60,14 @@ Field::Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector
  @param argFieldStatusArray フィールドの状態を示す配列
  */
 void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray) {
-    mFieldPointsArray = argFieldPointsArray;    // フィールドの得点
-    mFieldStatusArray = argFieldStatusArray;    // フィールドの状況
+    mFieldData.fieldPointsArray = argFieldPointsArray;    // フィールドの得点
+    mFieldData.fieldStatusArray = argFieldStatusArray;    // フィールドの状況
     
     mAllyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::STAY);  // 味方エージェントの行動番号の初期化
     mEnemyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::STAY); // 相手エージェントの行動番号の初期化
+    
+    mAllyAgentsPosition.resize(mTotalTeamAgents);   // 味方エージェントの位置の初期化
+    mEnemyAgentsPosition.resize(mTotalTeamAgents);  // 相手エージェントの位置の初期化
     
     // 得点の初期化
     mAllyScore  = Score{0, 0};
@@ -74,32 +77,35 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     int allyAgentsCount = 0, enemyAgentsCount = 0;
     
     for (int y = 0; y < mFieldSizeH; y++) {
-        mFieldAgentsIDArray.push_back(vector<int>(mFieldSizeW, 0));
+        mFieldData.fieldAgentsIDArray.push_back(vector<int>(mFieldSizeW, 0));
         
-        mFieldAllyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
-        mFieldEnemyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
+        mFieldData.fieldAllyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
+        mFieldData.fieldEnemyAreaSquaresArray.push_back(vector<bool>(mFieldSizeW, false));
         
-        mFieldAreaSideLinesArray.push_back(vector<bool>(mFieldSizeW, false));
+        mFieldData.fieldAreaSideLinesArray.push_back(vector<bool>(mFieldSizeW, false));
+        
         for (int x = 0; x < mFieldSizeW; x++) {
-            if (mFieldStatusArray[y][x] == 1) {
+            if (mFieldData.fieldStatusArray[y][x] == 1) {
                 allyAgentsCount ++;
-                mFieldAgentsIDArray[y][x] = allyAgentsCount;    // エージェントにIDを振り分ける
+                mFieldData.fieldAgentsIDArray[y][x] = allyAgentsCount;    // エージェントにIDを振り分ける
+                mAllyAgentsPosition[allyAgentsCount-1] = pair{x, y};
                 
-                mAllyScore.tile += mFieldPointsArray[y][x];     // 初期段階の合計得点の算出
+                mAllyScore.tile += mFieldData.fieldPointsArray[y][x];     // 初期段階の合計得点の算出
             }
-            else if (mFieldStatusArray[y][x] == -1) {
+            else if (mFieldData.fieldStatusArray[y][x] == -1) {
                 enemyAgentsCount ++;
-                mFieldAgentsIDArray[y][x] = -enemyAgentsCount;  // エージェントにIDを振り分ける
+                mFieldData.fieldAgentsIDArray[y][x] = -enemyAgentsCount;  // エージェントにIDを振り分ける
+                mEnemyAgentsPosition[enemyAgentsCount-1] = pair{x, y};
                 
-                mEnemyScore.tile += mFieldPointsArray[y][x];    // 初期段階の合計得点の算出
+                mEnemyScore.tile += mFieldData.fieldPointsArray[y][x];    // 初期段階の合計得点の算出
             }
             
             // 最大値と最小値の検出
-            if (mFieldPointsArray[y][x] > maxPoint) {
-                maxPoint = mFieldPointsArray[y][x];
+            if (mFieldData.fieldPointsArray[y][x] > maxPoint) {
+                maxPoint = mFieldData.fieldPointsArray[y][x];
             }
-            if (mFieldPointsArray[y][x] < minPoint) {
-                minPoint = mFieldPointsArray[y][x];
+            if (mFieldData.fieldPointsArray[y][x] < minPoint) {
+                minPoint = mFieldData.fieldPointsArray[y][x];
             }
         }
     }
@@ -109,8 +115,32 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
     
     // 合計エージェント数
     mTotalTeamAgents = allyAgentsCount;
+    
+    // 履歴には初期状態を代入
+    mFieldDataHistory.push_back(mFieldData);
 }
 
+void Field::decision() {
+    
+    for (int y = 0; y < mFieldSizeH; y++) {
+        for (int x = 0; x < mFieldSizeW; x++) {
+            if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] > 0) {
+                mAllyAgentsPosition[mFieldDataHistory.back().fieldAgentsIDArray[y][x]-1] = pair{x, y};
+                cout << mFieldDataHistory.back().fieldAgentsIDArray[y][x]-1 << ' ' << x << ',' << y << endl;
+            }
+            else if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] < 0) {
+                mEnemyAgentsPosition[(-1)*mFieldDataHistory.back().fieldAgentsIDArray[y][x]-1] = pair{x, y};
+            }
+        }
+    }
+    
+    // 履歴の最後からmFieldDataに繁栄
+    mFieldData = mFieldDataHistory.back();
+    
+    // 履歴をリセットし、履歴の最初にmFieldDataと同じ情報を代入
+    mFieldDataHistory.erase(mFieldDataHistory.begin(), mFieldDataHistory.end());
+    mFieldDataHistory.push_back(mFieldData);
+}
 
 /**
  Field::getAgentsPosition:
@@ -131,12 +161,12 @@ void Field::getAgentsPosition(vector<pair<int, int>> &argAllyAgentsPosition, vec
     for (int y = 0; y < mFieldSizeH; y++) {
         for (int x = 0; x < mFieldSizeW; x++) {
             // 味方のエージェント
-            if (mFieldAgentsIDArray[y][x] > 0) {
+            if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] > 0) {
                 argAllyAgentsPosition[countAllyAgents] = {x, y};
                 countAllyAgents ++;
             }
             // 相手のエージェント
-            if (mFieldAgentsIDArray[y][x] < 0) {
+            if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] < 0) {
                 argEnemyAgentsPosition[countEnemyAgents] = {x, y};
                 countEnemyAgents ++;
             }
@@ -269,7 +299,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
     
     // どちらのチームが対象か
     TileStatus::Type team;
-    if (mFieldStatusArray[argStartY][argStartX] == TileStatus::ALLY) {
+    if (mFieldDataHistory.back().fieldStatusArray[argStartY][argStartX] == TileStatus::ALLY) {
         team = TileStatus::ALLY;
     }
     else {
@@ -299,7 +329,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         for (int j = 0; j < 4; j++) {
             if (x+gSearchTileDirections[j].x >= 0 && y+gSearchTileDirections[j].y >= 0 &&
                 x+gSearchTileDirections[j].x <= mFieldSizeW-1 && y+gSearchTileDirections[j].y <= mFieldSizeH-1) {
-                if (mFieldStatusArray[y+gSearchTileDirections[j].y][x+gSearchTileDirections[j].x] != team) {
+                if (mFieldDataHistory.back().fieldStatusArray[y+gSearchTileDirections[j].y][x+gSearchTileDirections[j].x] != team) {
                     areThereOthersTiles = true;
                     break;
                 }
@@ -310,7 +340,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
         }
         
         // 違う色のマスならcontinue
-        if (mFieldStatusArray[y][x] != team) {
+        if (mFieldDataHistory.back().fieldStatusArray[y][x] != team) {
             continue;
         }
         
@@ -415,9 +445,9 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                         
                         // 自チームのタイルがなければカウント
                         // 条件: 自チームのタイルがなく、自チームの領域にも含まれていない
-                        if (mFieldStatusArray[lineY][lineX] != team &&
-                            ((team == TileStatus::ALLY && !mFieldAllyAreaSquaresArray[lineY][lineX]) ||
-                             (team == TileStatus::ENEMY && !mFieldEnemyAreaSquaresArray[lineY][lineX]))) {
+                        if (mFieldDataHistory.back().fieldStatusArray[lineY][lineX] != team &&
+                            ((team == TileStatus::ALLY && !mFieldDataHistory.back().fieldAllyAreaSquaresArray[lineY][lineX]) ||
+                             (team == TileStatus::ENEMY && !mFieldDataHistory.back().fieldEnemyAreaSquaresArray[lineY][lineX]))) {
                                 whiteTiles ++;
                             }
                         
@@ -434,10 +464,10 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                 // 領域が確認できたら、仮の領域への指定を反映し、領域の辺を成すマスをmFieldAreaSideLinesArrayでtrueにする
                                 vector<vector<bool>> areaSquares;
                                 if (team == TileStatus::ALLY) {
-                                    areaSquares = mFieldAllyAreaSquaresArray;
+                                    areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
                                 }
                                 else {
-                                    areaSquares = mFieldEnemyAreaSquaresArray;
+                                    areaSquares = mFieldDataHistory.back().fieldEnemyAreaSquaresArray;
                                 }
                                 bool areThereAreaPoints = searchAreaPointsSquares(areaSquares, lineXBefore, lineYBefore, team, false);
                                 
@@ -448,24 +478,24 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                         mAllyScore.area = 0;
                                         
                                         // 仮の領域への指定を反映
-                                        mFieldAllyAreaSquaresArray = areaSquares;
+                                        mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
                                         
                                     }
                                     else {
                                         mEnemyScore.area = 0;
                                         
                                         // 仮の領域への指定を反映
-                                        mFieldEnemyAreaSquaresArray = areaSquares;
+                                        mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
                                         
                                     }
                                     
                                     for (int j = 0; j < mFieldSizeH; j++) {
                                         for (int k = 0; k < mFieldSizeW; k++) {
-                                            if (team == TileStatus::ALLY && mFieldAllyAreaSquaresArray[j][k]) {
-                                                mAllyScore.area += abs(mFieldPointsArray[j][k]);
+                                            if (team == TileStatus::ALLY && mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k]) {
+                                                mAllyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                             }
-                                            if (team == TileStatus::ENEMY && mFieldEnemyAreaSquaresArray[j][k]) {
-                                                mEnemyScore.area += abs(mFieldPointsArray[j][k]);
+                                            if (team == TileStatus::ENEMY && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k]) {
+                                                mEnemyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                             }
                                         }
                                     }
@@ -473,7 +503,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                     // 領域を成す辺を反映
                                     Node* currentNode = &node;
                                     while(1) {
-                                        mFieldAreaSideLinesArray[currentNode->getPosition().y][currentNode->getPosition().x] = true;
+                                        mFieldDataHistory.back().fieldAreaSideLinesArray[currentNode->getPosition().y][currentNode->getPosition().x] = true;
                                         
                                         if (currentNode->getParentNode() == nullptr) {
                                             break;
@@ -561,7 +591,7 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         }
         
         // 同じ色のマスにあたったら: continue
-        if (mFieldStatusArray[y][x] == argBeTileStatus) {
+        if (mFieldDataHistory.back().fieldStatusArray[y][x] == argBeTileStatus) {
             continue;
         }
         
@@ -572,7 +602,7 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         
         // 領域の解除のとき 自チームの領域でなければ
         if (argDeleteArea && !argAreaSquares[y][x]) {
-            if (mFieldStatusArray[y][x] == TileStatus::NONE) {
+            if (mFieldDataHistory.back().fieldStatusArray[y][x] == TileStatus::NONE) {
                 possible = false;
             }
             continue;
@@ -624,7 +654,7 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
     Color agentIDRectColor = Palette::White;
     
     // 味方のタイルのとき
-    if (mFieldStatusArray[argY][argX] == 1) {
+    if (mFieldDataHistory.back().fieldStatusArray[argY][argX] == 1) {
         if (mAllyTeamColor == TeamColor::BLUE) {
             agentIDRectColor = Color(0, 128, 255); // 青
             rectColor = Color(0, 100, 200);
@@ -636,13 +666,13 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
         }
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
-        if (mFieldAgentsIDArray[argY][argX] != 0) {
+        if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] != 0) {
             Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
             mAgentIDTextFont(U"Ally").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
         }
     }
     // 相手のタイルのとき
-    if (mFieldStatusArray[argY][argX] == -1) {
+    if (mFieldDataHistory.back().fieldStatusArray[argY][argX] == -1) {
         if (!mAllyTeamColor == TeamColor::BLUE) {
             agentIDRectColor = Color(0, 128, 255); // 青
             rectColor = Color(0, 100, 200);
@@ -654,7 +684,7 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
         
-        if (mFieldAgentsIDArray[argY][argX] != 0) {
+        if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] != 0) {
             Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
             mAgentIDTextFont(U"Enemy").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
         }
@@ -673,7 +703,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
     Color rectColor;
     
     // 味方の領域のとき
-    if (mFieldAllyAreaSquaresArray[argY][argX]) {
+    if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX]) {
         if (mAllyTeamColor == TeamColor::BLUE) {
             rectColor = Color(150, 150, 255);   // 青
             
@@ -685,7 +715,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
     }
     // 相手の領域のとき
-    if (mFieldEnemyAreaSquaresArray[argY][argX]) {
+    if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX]) {
         if (!mAllyTeamColor == TeamColor::BLUE) {
             rectColor = Color(150, 150, 255);   // 青
         }
@@ -696,7 +726,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
     }
     // 両チームの領域のとき
-    if (mFieldAllyAreaSquaresArray[argY][argX] && mFieldEnemyAreaSquaresArray[argY][argX]) {
+    if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX] && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX]) {
         rectColor = Color(200, 100, 200);       // 紫
         
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
@@ -713,19 +743,19 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
  @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
  */
 void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor) {
-    unsigned long int textLength = to_string(mFieldPointsArray[argY][argX]).length();
+    unsigned long int textLength = to_string(mFieldDataHistory.back().fieldPointsArray[argY][argX]).length();
     
     Color textColor = Palette::Black;
     if (rectColor != Palette::White) {
         textColor = Palette::White;
     }
     
-    if (mFieldPointsArray[argY][argX] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
-        mPointTextFontBold(mFieldPointsArray[argY][argX])
+    if (mFieldDataHistory.back().fieldPointsArray[argY][argX] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
+        mPointTextFontBold(mFieldDataHistory.back().fieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/2-5, Color(textColor));
     }
     else {                                                      // 得点が上位20％(=mBigPointsBorder)未満なら普通の字
-        mPointTextFont(mFieldPointsArray[argY][argX])
+        mPointTextFont(mFieldDataHistory.back().fieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/2-5, Color(textColor));
     }
 }
@@ -741,14 +771,14 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
  @param argTileStatus   タイルを除去するチームのTileStatus（除去されるチームではない）
  */
 void Field::removeTile(const int argX, const int argY, const int argTileStatus) {
-    mFieldStatusArray[argY][argX] = 0;
+    mFieldDataHistory.back().fieldStatusArray[argY][argX] = 0;
     
     // 相手から点数を引く
     if (mCurrentAgentID > 0) {
-        mEnemyScore.tile -= mFieldPointsArray[argY][argX];
+        mEnemyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argY][argX];
     }
     else {
-        mAllyScore.tile -= mFieldPointsArray[argY][argX];
+        mAllyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argY][argX];
     }
     
     // 相手チームの領域に隣接していたら、相手チームの領域を再計算
@@ -760,26 +790,26 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
         
         // 領域の辺を成すタイルなら、除去後も領域が成立するか確認
         // 成立しなければ、領域を解除する
-        if ((argTileStatus == TileStatus::ENEMY && mFieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
-            (argTileStatus == TileStatus::ALLY && mFieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
-            if (mFieldAreaSideLinesArray[argY][argX]) {
+        if ((argTileStatus == TileStatus::ENEMY && mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
+            (argTileStatus == TileStatus::ALLY && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
+            if (mFieldDataHistory.back().fieldAreaSideLinesArray[argY][argX]) {
                 
                 // 味方チームのエージェントが相手チームのタイルを除去するとき
                 if (mCurrentAgentID > 0) {
-                    vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
+                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldEnemyAreaSquaresArray;
                     bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, true);
                     
                     if (!areThereArea) {
                         // 領域ポイントに反映
                         for (int j = 0; j < mFieldSizeH; j++) {
                             for (int k = 0; k < mFieldSizeW; k++) {
-                                if (mFieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                    mEnemyScore.area -= abs(mFieldPointsArray[j][k]);
+                                if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
+                                    mEnemyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                 }
                             }
                         }
                         
-                        mFieldEnemyAreaSquaresArray = areaSquares;
+                        mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
                         
                         // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
                         // 成立するなら領域を解除しない
@@ -789,32 +819,32 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
                             // 領域ポイントに反映
                             for (int j = 0; j < mFieldSizeH; j++) {
                                 for (int k = 0; k < mFieldSizeW; k++) {
-                                    if (!mFieldEnemyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                        mEnemyScore.area += abs(mFieldPointsArray[j][k]);
+                                    if (!mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k] && areaSquares[j][k]) {
+                                        mEnemyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                     }
                                 }
                             }
                             
-                            mFieldEnemyAreaSquaresArray = areaSquares;
+                            mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
                         }
                     }
                 }
                 // 相手チームのエージェントが味方チームのタイルを除去するとき
                 else if (mCurrentAgentID < 0) {
-                    vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
+                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
                     bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, true);
                     
                     if (!areThereArea) {
                         // 領域ポイントに反映
                         for (int j = 0; j < mFieldSizeH; j++) {
                             for (int k = 0; k < mFieldSizeW; k++) {
-                                if (mFieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                                    mAllyScore.area -= abs(mFieldPointsArray[j][k]);
+                                if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
+                                    mAllyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                 }
                             }
                         }
                         
-                        mFieldAllyAreaSquaresArray = areaSquares;
+                        mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
                         
                         // もう一度確認する（このタイルを除去しても領域が成立する場合もあるため）
                         // 成立するなら領域を解除しない
@@ -824,32 +854,32 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
                             // 領域ポイントに反映
                             for (int j = 0; j < mFieldSizeH; j++) {
                                 for (int k = 0; k < mFieldSizeW; k++) {
-                                    if (!mFieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
-                                        mAllyScore.area += abs(mFieldPointsArray[j][k]);
+                                    if (!mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
+                                        mAllyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                                     }
                                 }
                             }
                             
-                            mFieldAllyAreaSquaresArray = areaSquares;
+                            mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
                         }
                     }
                 }
             }
             else {
                 if (mCurrentAgentID > 0) {
-                    vector<vector<bool>> areaSquares = mFieldAllyAreaSquaresArray;
+                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
                     bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, false);
                     
                     if (areThereArea) {
-                        mFieldAllyAreaSquaresArray = areaSquares;
+                        mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
                     }
                 }
                 else if (mCurrentAgentID < 0) {
-                    vector<vector<bool>> areaSquares = mFieldEnemyAreaSquaresArray;
+                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldEnemyAreaSquaresArray;
                     bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
                     
                     if (areThereArea) {
-                        mFieldEnemyAreaSquaresArray = areaSquares;
+                        mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
                     }
                 }
             }
@@ -867,23 +897,23 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
  @param argTileStatus   タイルを置くチームのTileStatus
  */
 void Field::putTile(const int argX, const int argY, const int argTileStatus) {
-    mFieldStatusArray[argY][argX] = argTileStatus;
+    mFieldDataHistory.back().fieldStatusArray[argY][argX] = argTileStatus;
         
     if (mCurrentAgentID > 0) {
-        if (mFieldAllyAreaSquaresArray[argY][argX]) {
-            mFieldAllyAreaSquaresArray[argY][argX] = false;
-            mAllyScore.area -= abs(mFieldPointsArray[argY][argX]);
+        if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX]) {
+            mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX] = false;
+            mAllyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[argY][argX]);
         }
             
-        mAllyScore.tile += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
+        mAllyScore.tile += mFieldDataHistory.back().fieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
     }
     else {
-        if (mFieldEnemyAreaSquaresArray[argY][argX]) {
-            mFieldEnemyAreaSquaresArray[argY][argX] = false;
-            mEnemyScore.area -= abs(mFieldPointsArray[argY][argX]);
+        if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX]) {
+            mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX] = false;
+            mEnemyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[argY][argX]);
         }
             
-        mEnemyScore.tile += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
+        mEnemyScore.tile += mFieldDataHistory.back().fieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
     }
     
     // 領域ポイントができているか確認
@@ -905,13 +935,16 @@ void Field::putTile(const int argX, const int argY, const int argTileStatus) {
  @return エージェントの行動の番号（0~16）　field.hppのAgentActNumbersに定義済み
  */
 int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
-    int beTileStatus = mFieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチーム
+    int beTileStatus = mFieldData.fieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチーム
     int actNumber = 0;      // 行動の番号
     
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
+        mFieldDataHistory.push_back(mFieldDataHistory.back());
+        
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
         // 相手の領域を成すタイルなら、除去後にその領域が成立するか確認
-        if (mFieldStatusArray[argY][argX] == (-1)*mFieldStatusArray[argBeforeY][argBeforeX] && mFieldAgentsIDArray[argY][argX] == 0) {
+        if (mFieldDataHistory.back().fieldStatusArray[argY][argX] == (-1)*mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] &&
+            mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
             // タイルの除去（相手の領域を成すタイルなら、除去後にその領域が成立するか確認）
             removeTile(argX, argY, beTileStatus);
             
@@ -949,18 +982,18 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
         // 領域が成立するなら領域の設定も行う
-        else if (mFieldAgentsIDArray[argY][argX] == 0) {
+        else if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
             mCurrentSquarePosition = {argX, argY};
             
             // タイルを置く処理（まだタイルが置かれていない場合のみ）
             // 領域が成立するなら領域の設定も行う
-            if (mFieldStatusArray[argY][argX] != beTileStatus) {
+            if (mFieldDataHistory.back().fieldStatusArray[argY][argX] != beTileStatus) {
                 putTile(argX, argY, beTileStatus);
             }
             
             // エージェントの位置も移動させる
-            mFieldAgentsIDArray[argY][argX] = mCurrentAgentID;
-            mFieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
+            mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] = mCurrentAgentID;
+            mFieldDataHistory.back().fieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
             
             // 返す行動番号の取得
             if (argY-argBeforeY == -1) {
@@ -1018,14 +1051,14 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
  */
 void Field::setCurrentAgent(int argX, int argY) {
     // 新しくエージェントを選択するとき
-    if (mFieldAgentsIDArray[argY][argX] != 0) {
-        if (mCurrentAgentID == mFieldAgentsIDArray[argY][argX]) {
+    if (mFieldData.fieldAgentsIDArray[argY][argX] != 0) {
+        if (mCurrentAgentID == mFieldData.fieldAgentsIDArray[argY][argX]) {
             mCurrentSquarePosition = {-1, -1};
             mCurrentAgentID = 0;
         }
         else {
             mCurrentSquarePosition = {argX, argY};
-            mCurrentAgentID = mFieldAgentsIDArray[argY][argX];
+            mCurrentAgentID = mFieldData.fieldAgentsIDArray[argY][argX];
         }
     }
 }
@@ -1072,7 +1105,7 @@ void Field::draw() {
             fillSquare(Vec2{squarePositionX, squarePositionY}, x, y, rectColor);
             
             // 領域の塗りつぶし（マスが囲まれている場合）
-            if (mFieldStatusArray[y][x] == TileStatus::NONE) {
+            if (mFieldData.fieldStatusArray[y][x] == TileStatus::NONE) {
                 fillAreaSquare(Vec2{squarePositionX, squarePositionY}, x, y);
             }
             
@@ -1086,17 +1119,52 @@ void Field::draw() {
                 if (MouseL.pressed() && !mMousePressing) {
                     mMousePressing = true;      // 左クリックが押された瞬間だけ
                     
-                    // 周囲8方向のタイルの調査
+                    // 移動前のタイルから見た周囲8方向のタイルの調査
+                    // 周囲8方向のタイルの一つが選択したタイルならば、移動・除去が可能
                     for (int i=0; i<DIRECTIONS; i++) {
-                        // エージェントの行動（移動・除去）を操作するとき
-                        if (currentSquarePositionBefore + gMoveDirections[i] == Vec2{x, y}) {
-                            if (currentSquarePositionBefore != Vec2{-1, -1}) {
+                        
+                        if (x+(-1)*gMoveDirections[i].x < 0 || y+(-1)*gMoveDirections[i].y < 0 ||
+                            x+(-1)*gMoveDirections[i].x > mFieldSizeW-1 || y+(-1)*gMoveDirections[i].y > mFieldSizeH-1) {
+                            continue;
+                        }
+                        
+                        // 味方エージェントの操作
+                        if (mCurrentAgentID > 0) {
+                            if (mAllyAgentsPosition[mCurrentAgentID-1].first + gMoveDirections[i].x == x &&
+                                mAllyAgentsPosition[mCurrentAgentID-1].second + gMoveDirections[i].y == y) {
                                 // エージェントの行動に反映
                                 // 移動, 削除
-                                cout << "行動番号: " << agentMovement(x, y, currentSquarePositionBefore.x, currentSquarePositionBefore.y) << endl;
+                                cout << "行動番号: " << agentMovement(x, y,
+                                                                  mAllyAgentsPosition[mCurrentAgentID-1].first,
+                                                                  mAllyAgentsPosition[mCurrentAgentID-1].second)
+                                << endl;
+                                
+                                // 必要ならば、移動前の行動の取り消し
+                                if (currentSquarePositionBefore.x != mAllyAgentsPosition[mCurrentAgentID-1].first ||
+                                    currentSquarePositionBefore.y != mAllyAgentsPosition[mCurrentAgentID-1].second) {
+                                    // 移動の取り消し
+                                    if (mAllyAgentsActNumbers[mCurrentAgentID-1] >= 1 && mAllyAgentsActNumbers[mCurrentAgentID-1] <= 8) {
+                                        cout << x+gMoveDirections[mAllyAgentsActNumbers[mCurrentAgentID-1]].x << ',' << y+gMoveDirections[mAllyAgentsActNumbers[mCurrentAgentID-1]].y << endl;
+                                        mFieldData.fieldStatusArray[y+gMoveDirections[mAllyAgentsActNumbers[mCurrentAgentID-1]].y][x+gMoveDirections[mAllyAgentsActNumbers[mCurrentAgentID-1]].x] = 0;
+                                    }
+                                }
+                                
+                                break;
                             }
-                            
-                            break;
+                        }
+                        // 相手エージェントの操作
+                        if (mCurrentAgentID < 0) {
+                            if (mEnemyAgentsPosition[(-1)*mCurrentAgentID-1].first + gMoveDirections[i].x == x &&
+                                mEnemyAgentsPosition[(-1)*mCurrentAgentID-1].second + gMoveDirections[i].y == y) {
+                                // エージェントの行動に反映
+                                // 移動, 削除
+                                cout << "行動番号: " << agentMovement(x, y,
+                                                                  mEnemyAgentsPosition[(-1)*mCurrentAgentID-1].first,
+                                                                  mEnemyAgentsPosition[(-1)*mCurrentAgentID-1].second)
+                                << endl;
+                                
+                                break;
+                            }
                         }
                     }
                     

@@ -19,6 +19,9 @@ public:
     // フィールドの設定
     void setField(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray);
     
+    // 操作の確定（反映）
+    void decision();
+    
     // フィールドからエージェントの位置を取得
     // 要素番号はエージェントIDと同じで、相手のエージェントの場合はエージェントIDの絶対値が要素番号になる
     // 例: 相手の1人目のエージェント（エージェントID -1）のx座標 -> argEnemyAgentsPosition[1].first
@@ -74,15 +77,23 @@ public:
     void draw();
     
 private:
+    /*
     vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
     vector<vector<int>> mFieldStatusArray;              // フィールドの状況格納用
     vector<vector<int>> mFieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
     vector<vector<bool>> mFieldAllyAreaSquaresArray;    // 味方の領域の格納用
     vector<vector<bool>> mFieldEnemyAreaSquaresArray;   // 相手の領域の格納用
     vector<vector<bool>> mFieldAreaSideLinesArray;      // 領域を成す辺の格納用
+    */
+    fieldDataStruct mFieldData;                         // フィールドの情報（点数, 状況, エージェントの場所, 領域, 領域を成す辺）
+    
+    vector<fieldDataStruct> mFieldDataHistory;   // このターン内のフィールドへの操作履歴
     
     vector<int> mAllyAgentsActNumbers;              // 味方エージェントの行動の番号
     vector<int> mEnemyAgentsActNumbers;             // 相手エージェントの行動の番号
+    
+    vector<pair<int, int>> mAllyAgentsPosition;     // 味方エージェントの位置
+    vector<pair<int, int>> mEnemyAgentsPosition;    // 相手エージェントの位置
     
     Score mAllyScore;                               // 味方チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
     Score mEnemyScore;                              // 相手チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
