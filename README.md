@@ -4,9 +4,9 @@
 競技部門用の入出力部です。採用されるかもしれないしされないかもしれません。
 
 ## 動作確認環境
-- macOS 10.14 mojave
+- macOS 10.14 mojave (64bit)
   - Xcode 10.2.1
-- Windows 10
+- Windows 10 (64bit)
   - Visual Studio 2019
 
 ## 使用環境
@@ -14,30 +14,32 @@
 - OpenSiv3D v0.3.1
 
 ## 実行方法 
-OpenSiv3Dのファイルはサイズが大きいため、このリポジトリにはXcodeのプロジェクトファイルのみ置いてあります。  
-このままではビルドできません。Xcodeでビルドして動かすには、OpenSiv3Dの導入が必要です。  
-（ただし、OpenSiv3Dを導入しなくても`procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/bin/`にあるempty.appから実行することはできます）  
+OpenSiv3Dのファイルはサイズが大きいため、このリポジトリにはXcodeおよびVisual Studioのプロジェクトファイルのみ置いてあります。  
+このままではビルドできません。ビルドして動かすには、OpenSiv3Dの導入が必要です。  
+（ただし、macOSではOpenSiv3Dを導入しなくても`procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/bin/`にあるempty.appから実行することはできます）  
 
 ### OpenSiv3Dの導入方法
-OpenSiv3Dの導入は簡単で、ファイルをコピーするだけです。  
+OpenSiv3Dの導入は簡単で、macOSの場合はファイルをコピーするだけです。    
+Windowsの場合はOpenSiv3D SDKのインストールが必要ですが、特に面倒な設定はありません。
 
 #### macOSの場合
+1. Xcodeをインストールします。
 1. 以下のサイトから、OpenSiv3D プロジェクトテンプレート（zip形式）をダウンロードします。  
 https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8B%E6%BA%96%E5%82%99_(macOS)
 2. ダウンロードが完了したら、zipファイルを展開し、libフォルダとincludeフォルダをローカルリポジトリのフォルダ`procon30_comp_ProvisionalOutput`にコピーします。（examplesフォルダは不要）
 
 #### Windowsの場合
+参考 : https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8B%E6%BA%96%E5%82%99_(Windows)
 1. Visual Studio 2019 Communityのインストーラをダウンロードします。
 https://visualstudio.microsoft.com/ja/downloads/
 2. インストーラを起動して、「C++ によるデスクトップ開発」を選択し、インストールします。
 3. インストールが完了したら、OpenSiv3D SDKをダウンロードし、インストールします。
   https://siv3d.jp/downloads/Siv3D/OpenSiv3D(0.3.2)Installer.exe
 
-参考 : https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8B%E6%BA%96%E5%82%99_(Windows)
-
 ### ビルド方法
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
-Windowsの場合はVisual Studio 2019を使用してください。
+Windowsの場合はVisual Studio 2019を使用してください。  
+OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、恐らく他のIDEでは完全には動かないと思います。  
 
 #### Xcodeでビルドする場合
 1. `procon30_comp_ProvisionalOutput/projects/ProvisionalOutput/ProvisionalOutput.xcodeproj`をXcodeで開く。
