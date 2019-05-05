@@ -275,7 +275,7 @@ void Main() {
     fieldData.setFont(pointTextFont, pointTextFontBold, agentIDTextFont);
     
     /*-----------------ターン関連----------------*/
-    int turnsNow = 1;
+    int countTurns = 1;
     
     /*-----------------ボタン関連----------------*/
     Button nextTurnButton(U"確定", Rect(50, 500, 180, 80));
@@ -290,13 +290,13 @@ void Main() {
         
         // ターン数の描画
         font16(U"Turns : ").draw(10, 10, Color(Palette::Black));
-        font16(turnsNow).draw(80, 10, Color(Palette::Black));
+        font16(countTurns).draw(80, 10, Color(Palette::Black));
         
         // 確定ボタン
         nextTurnButton.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font28);
         if (nextTurnButton.getStatus()) {
-            //cout << "確定ボタンが押された" << endl;
             fieldData.decision();
+            countTurns ++;
         }
         
         // 得点の描画

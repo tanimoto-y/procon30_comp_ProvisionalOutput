@@ -58,8 +58,14 @@ public:
     // タイル点数の表示
     void printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
+    // エージェントの移動経路を示す矢印の表示
+    void drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY);
+    
     // タイル除去
     void removeTile(const int argX, const int argY, const int argTileStatus);
+    
+    // 領域を除去
+    void removeArea(const int argX, const int argY, const int argBeforeX, const int argBeforeY, const int argRemoveTeam);
     
     // タイル設置
     void putTile(const int argX, const int argY, const int argTileStatus);
@@ -88,15 +94,6 @@ private:
     fieldDataStruct mFieldData;                         // フィールドの情報（点数, 状況, エージェントの場所, 領域, 領域を成す辺）
     
     vector<fieldDataStruct> mFieldDataHistory;   // このターン内のフィールドへの操作履歴
-    
-    vector<int> mAllyAgentsActNumbers;              // 味方エージェントの行動の番号
-    vector<int> mEnemyAgentsActNumbers;             // 相手エージェントの行動の番号
-    
-    vector<pair<int, int>> mAllyAgentsPosition;     // 味方エージェントの位置
-    vector<pair<int, int>> mEnemyAgentsPosition;    // 相手エージェントの位置
-    
-    Score mAllyScore;                               // 味方チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
-    Score mEnemyScore;                              // 相手チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
     
     int mFieldSizeW, mFieldSizeH;                   // フィールドの大きさ
     int mFieldLineLengthW, mFieldLineLengthH;       // フィールドの枠の長さ

@@ -60,6 +60,12 @@ typedef struct Score {
  @var fieldAllyAreaSquaresArray     味方の領域の格納用
  @var fieldEnemyAreaSquaresArray    相手の領域の格納用
  @var fieldAreaSideLinesArray       領域を成す辺の格納用
+ @var allyAgentsActNumbers          味方エージェントの行動の番号
+ @var enemyAgentsActNumbers         相手エージェントの行動の番号
+ @var allyAgentsPosition            味方エージェントの位置
+ @var enemyAgentsPosition           相手エージェントの位置
+ @var allyScore                     味方チームの得点（Score構造体）
+ @var enemyScore                    相手チームの得点（Score構造体）
  */
 typedef struct fieldDataStruct {
     vector<vector<int>> fieldPointsArray;              // フィールドの点数格納用
@@ -68,6 +74,15 @@ typedef struct fieldDataStruct {
     vector<vector<bool>> fieldAllyAreaSquaresArray;    // 味方の領域の格納用
     vector<vector<bool>> fieldEnemyAreaSquaresArray;   // 相手の領域の格納用
     vector<vector<bool>> fieldAreaSideLinesArray;      // 領域を成す辺の格納用
+    
+    vector<int> allyAgentsActNumbers;                  // 味方エージェントの行動の番号
+    vector<int> enemyAgentsActNumbers;                 // 相手エージェントの行動の番号
+    
+    vector<pair<int, int>> allyAgentsPosition;         // 味方エージェントの位置
+    vector<pair<int, int>> enemyAgentsPosition;        // 相手エージェントの位置
+    
+    Score allyScore;                                   // 味方チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
+    Score enemyScore;                                  // 相手チームの得点（合計得点 total()、タイルポイント tile、領域ポイント areaを含む構造体）
 } fieldDataStruct;
 
 /*-------------------- 名前空間 --------------------*/
