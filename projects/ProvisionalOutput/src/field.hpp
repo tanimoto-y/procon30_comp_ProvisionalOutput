@@ -65,7 +65,7 @@ public:
     void removeTile(const int argX, const int argY, const int argTileStatus);
     
     // 領域を除去
-    void removeArea(const int argX, const int argY, const int argBeforeX, const int argBeforeY, const int argRemoveTeam);
+    void removeArea(const int argX, const int argY, const int argRemoveTeam);
     
     // タイル設置
     void putTile(const int argX, const int argY, const int argTileStatus);
@@ -84,6 +84,9 @@ public:
     
     // 探索部の起動
     void startSolving();
+    
+    // 自動探索（ターン切替時）
+    void setSolvingWithChangeTurn(bool argBool);
     
 private:
     /*
@@ -122,7 +125,8 @@ private:
     
     int mBigPointsBorder;                           // 大きい点数の基準（この値を超えると太字で点数を表示する）
     
-    bool solvedPerTurn;                             // このターン内で探索したかどうか（したならtrue）
+    bool mSolvedPerTurn;                            // このターン内で探索したかどうか（したならtrue）
+    bool mSolvingWithChangeTurn;                    // ターン切り替えと同時に探索するかどうか（するならtrue）
 };
 
 #endif /* field_hpp */

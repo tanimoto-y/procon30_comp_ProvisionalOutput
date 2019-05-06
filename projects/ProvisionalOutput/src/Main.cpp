@@ -1,5 +1,6 @@
 #include "field.hpp"
 #include "button.hpp"
+#include "check_box.hpp"
 
 using namespace std;
 
@@ -278,11 +279,14 @@ void Main() {
     int countTurns = 1;
     
     /*-----------------ボタン関連----------------*/
-    Button nextTurnButton(U"確定", Rect(50, WINDOW_SIZE_H-120, 180, 80));
-    Button solverButton(U"探索", Rect(WINDOW_SIZE_W-50-180, WINDOW_SIZE_H-120, 180, 80));
+    Button nextTurnButton(U"確定", Rect(50, WINDOW_SIZE_H-150, 180, 80));
+    Button solverButton(U"探索", Rect(WINDOW_SIZE_W-50-180, WINDOW_SIZE_H-150, 180, 80));
     Color buttonBaseColor(255, 255, 255);
     Color buttonBaseColorUnderCursor(230, 230, 230);
     Color buttonFrameColor(0, 162, 232);
+    
+    /*-------------チェックボックス関連------------*/
+    CheckBox solvingCheck(Rect(50, WINDOW_SIZE_H-60, 20, 20));
     
     /*------ループ（ウィンドウが閉じられるまで）------*/
     while (System::Update()) {
@@ -293,18 +297,24 @@ void Main() {
         font16(U"Turns : ").draw(10, 10, Color(Palette::Black));
         font16(countTurns).draw(80, 10, Color(Palette::Black));
         
-        // 確定ボタン -> 次のターンへ
+        // 確定ボタン -> 押す: 次のターンへ
         nextTurnButton.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font28);
         if (nextTurnButton.getStatus()) {
             fieldData.decision();
             countTurns ++;
         }
         
-        // 探索ボタン -> 探索開始
+        // 探索ボタン -> 押す: 探索開始
         solverButton.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font28);
         if (solverButton.getStatus()) {
             fieldData.startSolving();
         }
+        
+        // チェックボックス -> ✓: ターン変更と同時に探索
+        solvingCheck.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font16);
+        font16(U"確定と同時に探索").draw(50+20+5, WINDOW_SIZE_H-60, Color(Palette::Black));
+        fieldData.setSolvingWithChangeTurn(solvingCheck.getStatus());
+        
         
         // 得点の描画
         printTotalPoints(Team::ENEMY, !allyTeamColor, fieldData, font16, font16Bold, font28, totalPointsTextFont);
