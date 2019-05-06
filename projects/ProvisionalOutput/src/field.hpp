@@ -82,6 +82,9 @@ public:
     // フィールドの描画
     void draw();
     
+    // 探索部の起動
+    void startSolving();
+    
 private:
     /*
     vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
@@ -118,6 +121,8 @@ private:
     Font mAgentIDTextFont;                          // エージェントID表示用のフォント
     
     int mBigPointsBorder;                           // 大きい点数の基準（この値を超えると太字で点数を表示する）
+    
+    bool solvedPerTurn;                             // このターン内で探索したかどうか（したならtrue）
 };
 
 #endif /* field_hpp */

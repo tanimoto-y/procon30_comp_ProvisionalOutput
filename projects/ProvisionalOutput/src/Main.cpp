@@ -278,7 +278,8 @@ void Main() {
     int countTurns = 1;
     
     /*-----------------ボタン関連----------------*/
-    Button nextTurnButton(U"確定", Rect(50, 500, 180, 80));
+    Button nextTurnButton(U"確定", Rect(50, WINDOW_SIZE_H-120, 180, 80));
+    Button solverButton(U"探索", Rect(WINDOW_SIZE_W-50-180, WINDOW_SIZE_H-120, 180, 80));
     Color buttonBaseColor(255, 255, 255);
     Color buttonBaseColorUnderCursor(230, 230, 230);
     Color buttonFrameColor(0, 162, 232);
@@ -292,11 +293,17 @@ void Main() {
         font16(U"Turns : ").draw(10, 10, Color(Palette::Black));
         font16(countTurns).draw(80, 10, Color(Palette::Black));
         
-        // 確定ボタン
+        // 確定ボタン -> 次のターンへ
         nextTurnButton.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font28);
         if (nextTurnButton.getStatus()) {
             fieldData.decision();
             countTurns ++;
+        }
+        
+        // 探索ボタン -> 探索開始
+        solverButton.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font28);
+        if (solverButton.getStatus()) {
+            fieldData.startSolving();
         }
         
         // 得点の描画

@@ -128,6 +128,9 @@ void Field::decision() {
     mFieldDataHistory.erase(mFieldDataHistory.begin(), mFieldDataHistory.end());
     mFieldDataHistory.shrink_to_fit();
     mFieldDataHistory.push_back(mFieldData);
+    
+    // 探索をリセット
+    solvedPerTurn = false;
 }
 
 /**
@@ -592,7 +595,6 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         if (argDeleteArea && !argAreaSquares[y][x]) {
             if (mFieldDataHistory.back().fieldStatusArray[y][x] == TileStatus::NONE) {
                 possible = false;
-                break;
             }
             
             continue;
@@ -604,7 +606,6 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         
         if (!nextTile) {
             possible = false;   // 移動先で領域が成立しないことがわかったら: possible = false（領域実現不可）
-            break;
         }
     }
     
@@ -997,9 +998,11 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         // 最後の操作履歴を削除し、2つ前の操作履歴に戻す
         if (mCurrentAgentID > 0) {
             // 同じエージェントが同じターン内の前回の操作で除去を行っていた場合
-            if (mFieldDataHistory.end()[-2].allyAgentsActNumbers[mCurrentAgentID-1] >= 9 && mFieldDataHistory.end()[-3].allyAgentsActNumbers[mCurrentAgentID-1] < 9) {
-                mFieldDataHistory.back().fieldStatusArray = mFieldDataHistory.end()[-3].fieldStatusArray;
-                mFieldDataHistory.back().fieldEnemyAreaSquaresArray = mFieldDataHistory.end()[-3].fieldEnemyAreaSquaresArray;
+            if (mFieldDataHistory.size() > 2) {
+                if (mFieldDataHistory.end()[-2].allyAgentsActNumbers[mCurrentAgentID-1] >= 9 && mFieldDataHistory.end()[-3].allyAgentsActNumbers[mCurrentAgentID-1] < 9) {
+                    mFieldDataHistory.back().fieldStatusArray = mFieldDataHistory.end()[-3].fieldStatusArray;
+                    mFieldDataHistory.back().fieldEnemyAreaSquaresArray = mFieldDataHistory.end()[-3].fieldEnemyAreaSquaresArray;
+                }
             }
             
             if (mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].first  != mFieldData.allyAgentsPosition[mCurrentAgentID-1].first ||
@@ -1015,9 +1018,11 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         }
         else if (mCurrentAgentID < 0) {
             // 同じエージェントが同じターン内の前回の操作で除去を行っていた場合
-            if (mFieldDataHistory.end()[-2].enemyAgentsActNumbers[(-1)*mCurrentAgentID-1] >= 9 && mFieldDataHistory.end()[-3].enemyAgentsActNumbers[(-1)*mCurrentAgentID-1] < 9) {
-                mFieldDataHistory.back().fieldStatusArray = mFieldDataHistory.end()[-3].fieldStatusArray;
-                mFieldDataHistory.back().fieldAllyAreaSquaresArray = mFieldDataHistory.end()[-3].fieldAllyAreaSquaresArray;
+            if (mFieldDataHistory.size() > 2) {
+                if (mFieldDataHistory.end()[-2].enemyAgentsActNumbers[(-1)*mCurrentAgentID-1] >= 9 && mFieldDataHistory.end()[-3].enemyAgentsActNumbers[(-1)*mCurrentAgentID-1] < 9) {
+                    mFieldDataHistory.back().fieldStatusArray = mFieldDataHistory.end()[-3].fieldStatusArray;
+                    mFieldDataHistory.back().fieldAllyAreaSquaresArray = mFieldDataHistory.end()[-3].fieldAllyAreaSquaresArray;
+                }
             }
             
             if (mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].first  != mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].first ||
@@ -1303,3 +1308,41 @@ void Field::draw() {
     return;
 }
 
+/**
+ Field::startSolving:
+    探索の開始
+ */
+void Field::startSolving() {
+    // 探索は1ターン1回まで
+    if (!solvedPerTurn) {
+        solvedPerTurn = true;
+    }
+    else {
+        return;
+    }
+    
+    // とりあえず全てのエージェントをランダムに移動
+    for (int i = 0; i < mTotalTeamAgents; i++) {
+        // 味方
+        int moveX = rand()%3-1;
+        int moveY = rand()%3-1;
+        
+        if (mFieldData.allyAgentsPosition[i].first+moveX < 0 || mFieldData.allyAgentsPosition[i].second+moveY < 0 || mFieldData.allyAgentsPosition[i].first+moveX > mFieldSizeW-1 || mFieldData.allyAgentsPosition[i].second+moveY > mFieldSizeH-1) {
+            continue;
+        }
+        
+        setCurrentAgent(mFieldData.allyAgentsPosition[i].first, mFieldData.allyAgentsPosition[i].second);
+        agentMovement(mFieldData.allyAgentsPosition[i].first+moveX, mFieldData.allyAgentsPosition[i].second+moveY, mFieldData.allyAgentsPosition[i].first, mFieldData.allyAgentsPosition[i].second);
+        
+        // 相手
+        moveX = rand()%3-1;
+        moveY = rand()%3-1;
+        
+        if (mFieldData.enemyAgentsPosition[i].first+moveX < 0 || mFieldData.enemyAgentsPosition[i].second+moveY < 0 || mFieldData.enemyAgentsPosition[i].first+moveX > mFieldSizeW-1 || mFieldData.enemyAgentsPosition[i].second+moveY > mFieldSizeH-1) {
+            continue;
+        }
+        
+        setCurrentAgent(mFieldData.enemyAgentsPosition[i].first, mFieldData.enemyAgentsPosition[i].second);
+        agentMovement(mFieldData.enemyAgentsPosition[i].first+moveX, mFieldData.enemyAgentsPosition[i].second+moveY, mFieldData.enemyAgentsPosition[i].first, mFieldData.enemyAgentsPosition[i].second);
+    }
+}
