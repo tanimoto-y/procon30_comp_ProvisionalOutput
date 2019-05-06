@@ -136,6 +136,8 @@ void Field::decision() {
     if (mSolvingWithChangeTurn) {
         startSolving();
     }
+    
+    cout << "------------------" << endl;
 }
 
 /**
@@ -580,10 +582,11 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         x = argStartX + gSearchTileDirections[i].x;
         y = argStartY + gSearchTileDirections[i].y;
         
+        
         // フィールドから出たら: 領域ができていないためループから出てfalseを返す
         if (x < 0 || y < 0 || x > mFieldSizeW-1 || y > mFieldSizeH-1) {
             possible = false;
-            break;
+            continue;
         }
         
         // 同じ色のマスにあたったら: continue
@@ -970,7 +973,7 @@ void Field::putTile(const int argX, const int argY, const int argTileStatus) {
     }
     
     // 領域ポイントができているか確認
-    searchAreaPoints(argX, argY);   // ここで領域の外に領域マスが出現する場合がある
+    searchAreaPoints(argX, argY);
 }
 
 /**
@@ -996,6 +999,8 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         // 同じターン内で領域を成すマスからエージェントを移動させようとしたとき
         if (mFieldDataHistory.back().fieldAreaSideLinesArray[argBeforeY][argBeforeX] &&
             mFieldDataHistory.back().fieldStatusArray[argY][argX] == mFieldData.fieldStatusArray[argBeforeY][argBeforeX]) {
+            
+            mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
             
             for (int i = 0; i < 4; i++) {
                 if (argBeforeX + gSearchTileDirections[i].x < 0 || argBeforeY + gSearchTileDirections[i].y < 0 ||
@@ -1218,7 +1223,7 @@ void Field::draw() {
     // チーム色による塗りつぶし
     // エージェントIDの表示
     // マスの上にカーソルがあれば マスに枠を表示
-    Vec2 currentSquarePositionBefore = mCurrentSquarePosition;
+    //Vec2 currentSquarePositionBefore = mCurrentSquarePosition;
     
     for (int y = 0; y < mFieldSizeH; y++) {
         for (int x = 0; x < mFieldSizeW; x++) {
