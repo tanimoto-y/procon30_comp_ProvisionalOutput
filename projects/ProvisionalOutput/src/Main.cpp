@@ -5,6 +5,98 @@
 using namespace std;
 
 /**
+ AgentActNumbers::getAgentActNumber:
+    座標をもとに、エージェントの行動の番号を返す
+ 
+ @param position                移動先の座標（pair<int,int>型）
+ @param beforePosition          移動前の座標（pair<int,int>型）
+ @param argIsAgentRemovingTiles タイルの除去ならtrue, 除去でなければfalse
+ @return                        行動の番号
+ */
+int AgentActNumbers::getAgentActNumber(pair<int, int> position, pair<int, int> beforePosition, bool argIsAgentRemovingTiles) {
+    pair movedPosition = {position.first-beforePosition.first, position.second-beforePosition.second};
+    int actNumber = -1;
+    
+    // 返す行動番号の取得
+    if (movedPosition.second == -1) {
+        if (movedPosition.first == -1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_UP_LEFT;      // 左上を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_UP_LEFT;          // 左上へ移動
+            }
+        }
+        else if (movedPosition.first == 0) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_UP;           // 上を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_UP;               // 上へ移動
+            }
+        }
+        else if (movedPosition.first == 1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_UP_RIGHT;     // 右上を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_UP_RIGHT;         // 右上へ移動
+            }
+        }
+    }
+    else if (movedPosition.second == 0) {
+        if (movedPosition.first == -1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_LEFT;         // 左を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_LEFT;             // 左へ移動
+            }
+        }
+        else if (movedPosition.first == 1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_RIGHT;        // 左上を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_RIGHT;            // 左上へ移動
+            }
+        }
+        else  {
+            actNumber = AgentActNumbers::STAY;                    // とどまる
+        }
+    }
+    else {
+        if (movedPosition.first == -1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_DOWN_LEFT;    // 左下を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_DOWN_LEFT;        // 左下へ移動
+            }
+        }
+        else if (movedPosition.first == 0) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_DOWN;         // 下を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_DOWN;             // 下へ移動
+            }
+        }
+        else if (movedPosition.first == 1) {
+            if (argIsAgentRemovingTiles) {
+                actNumber = AgentActNumbers::REMOVE_DOWN_RIGHT;   // 右下を除去
+            }
+            else {
+                actNumber = AgentActNumbers::GO_DOWN_RIGHT;       // 右下へ移動
+            }
+        }
+    }
+    
+    return actNumber;
+}
+
+
+/**
  centerText:
  引数で指定した座標の中央に文字を表示する関数。
  文字列(String)型用

@@ -1082,36 +1082,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             removeTile(argX, argY, beTileStatus);
             
             // 返す行動番号の取得
-            if (argY-argBeforeY == -1) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::REMOVE_UP_LEFT;      // 左上を除去
-                }
-                else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::REMOVE_UP;           // 上を除去
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::REMOVE_UP_RIGHT;     // 右上を除去
-                }
-            }
-            else if (argY-argBeforeY == 0) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::REMOVE_LEFT;         // 左を除去
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::REMOVE_RIGHT;        // 右を除去
-                }
-            }
-            else if (argY-argBeforeY == 1) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::REMOVE_DOWN_LEFT;    // 左下を除去
-                }
-                else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::REMOVE_DOWN;         // 下を除去
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::REMOVE_DOWN_RIGHT;   // 右下を除去
-                }
-            }
+            actNumber = AgentActNumbers::getAgentActNumber(pair{argX, argY}, pair{argBeforeX, argBeforeY}, true);
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
         // 領域が成立するなら領域の設定も行う
@@ -1140,36 +1111,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             }
             
             // 返す行動番号の取得
-            if (argY-argBeforeY == -1) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GO_UP_LEFT;        // 左上へ移動
-                }
-                else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::GO_UP;             // 上へ移動
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GO_UP_RIGHT;       // 右上へ移動
-                }
-            }
-            else if (argY-argBeforeY == 0) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GO_LEFT;           // 左へ移動
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GO_RIGHT;          // 右へ移動
-                }
-            }
-            else if (argY-argBeforeY == 1) {
-                if (argX-argBeforeX == -1) {
-                    actNumber = AgentActNumbers::GO_DOWN_LEFT;      // 左下へ移動
-                }
-                else if (argX-argBeforeX == 0) {
-                    actNumber = AgentActNumbers::GO_DOWN;           // 下へ移動
-                }
-                else if (argX-argBeforeX == 1) {
-                    actNumber = AgentActNumbers::GO_DOWN_RIGHT;     // 右下へ移動
-                }
-            }
+            actNumber = AgentActNumbers::getAgentActNumber(pair{argX, argY}, pair{argBeforeX, argBeforeY}, false);
         }
     }
     

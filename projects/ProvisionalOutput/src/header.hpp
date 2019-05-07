@@ -134,6 +134,10 @@ namespace AgentActNumbers {
         REMOVE_DOWN_LEFT    = 15,   // 除去: 左下
         REMOVE_LEFT         = 16,   // 除去: 左
     };
+    
+    // 座標から行動の番号を返す関数
+    // Main.cpp内に動作内容あり
+    int getAgentActNumber(pair<int, int> position, pair<int, int> beforePosition, bool argIsAgentRemovingTiles);
 }
 
 
