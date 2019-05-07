@@ -60,7 +60,8 @@ Field::Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector
  @param argFieldStatusArray フィールドの状態を示す配列
  */
 void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vector<vector<int>> &argFieldStatusArray) {
-    mFieldData.fieldPointsArray = argFieldPointsArray;    // フィールドの得点
+    mFieldPointsArray = argFieldPointsArray;    // フィールドの得点
+    
     mFieldData.fieldStatusArray = argFieldStatusArray;    // フィールドの状況
     
     mFieldData.allyAgentsActNumbers.resize(mTotalTeamAgents, AgentActNumbers::STAY);  // 味方エージェントの行動番号の初期化
@@ -90,22 +91,22 @@ void Field::setField(const vector<vector<int>> &argFieldPointsArray, const vecto
                 mFieldData.fieldAgentsIDArray[y][x] = allyAgentsCount;    // エージェントにIDを振り分ける
                 mFieldData.allyAgentsPosition[allyAgentsCount-1] = pair{x, y};
                 
-                mFieldData.allyScore.tile += mFieldData.fieldPointsArray[y][x];     // 初期段階の合計得点の算出
+                mFieldData.allyScore.tile += mFieldPointsArray[y][x];     // 初期段階の合計得点の算出
             }
             else if (mFieldData.fieldStatusArray[y][x] == -1) {
                 enemyAgentsCount ++;
                 mFieldData.fieldAgentsIDArray[y][x] = -enemyAgentsCount;  // エージェントにIDを振り分ける
                 mFieldData.enemyAgentsPosition[enemyAgentsCount-1] = pair{x, y};
                 
-                mFieldData.enemyScore.tile += mFieldData.fieldPointsArray[y][x];    // 初期段階の合計得点の算出
+                mFieldData.enemyScore.tile += mFieldPointsArray[y][x];    // 初期段階の合計得点の算出
             }
             
             // 最大値と最小値の検出
-            if (mFieldData.fieldPointsArray[y][x] > maxPoint) {
-                maxPoint = mFieldData.fieldPointsArray[y][x];
+            if (mFieldPointsArray[y][x] > maxPoint) {
+                maxPoint = mFieldPointsArray[y][x];
             }
-            if (mFieldData.fieldPointsArray[y][x] < minPoint) {
-                minPoint = mFieldData.fieldPointsArray[y][x];
+            if (mFieldPointsArray[y][x] < minPoint) {
+                minPoint = mFieldPointsArray[y][x];
             }
         }
     }
@@ -490,10 +491,10 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                                     for (int j = 0; j < mFieldSizeH; j++) {
                                         for (int k = 0; k < mFieldSizeW; k++) {
                                             if (team == TileStatus::ALLY && mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k]) {
-                                                mFieldDataHistory.back().allyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                                                mFieldDataHistory.back().allyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                             if (team == TileStatus::ENEMY && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k]) {
-                                                mFieldDataHistory.back().enemyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                                                mFieldDataHistory.back().enemyScore.area += abs(mFieldPointsArray[j][k]);
                                             }
                                         }
                                     }
@@ -746,19 +747,19 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
  @param rectColor           Color型（空のままでも、なにか指定していても動作上変わることはない）
  */
 void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor) {
-    unsigned long int textLength = to_string(mFieldDataHistory.back().fieldPointsArray[argY][argX]).length();
+    unsigned long int textLength = to_string(mFieldPointsArray[argY][argX]).length();
     
     Color textColor = Palette::Black;
     if (rectColor != Palette::White) {
         textColor = Palette::White;
     }
     
-    if (mFieldDataHistory.back().fieldPointsArray[argY][argX] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
-        mPointTextFontBold(mFieldDataHistory.back().fieldPointsArray[argY][argX])
+    if (mFieldPointsArray[argY][argX] >= mBigPointsBorder) {    // 得点が上位20％(=mBigPointsBorder)以上なら太字
+        mPointTextFontBold(mFieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_BIG_FONT_SIZE)/2-5, Color(textColor));
     }
     else {                                                      // 得点が上位20％(=mBigPointsBorder)未満なら普通の字
-        mPointTextFont(mFieldDataHistory.back().fieldPointsArray[argY][argX])
+        mPointTextFont(mFieldPointsArray[argY][argX])
         .draw(argSquarePosition.x+mFieldSquareSize/2-textLength*(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/3, argSquarePosition.y+mFieldSquareSize/2-(mFieldSquareSize-POINT_TEXT_FONT_SIZE)/2-5, Color(textColor));
     }
 }
@@ -823,10 +824,10 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
     
     // 相手から点数を引く
     if (mCurrentAgentID > 0) {
-        mFieldDataHistory.back().enemyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argY][argX];
+        mFieldDataHistory.back().enemyScore.tile -= mFieldPointsArray[argY][argX];
     }
     else {
-        mFieldDataHistory.back().allyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argY][argX];
+        mFieldDataHistory.back().allyScore.tile -= mFieldPointsArray[argY][argX];
     }
     
     // 相手チームの領域に隣接していたら、相手チームの領域を再計算
@@ -903,12 +904,12 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
             for (int k = 0; k < mFieldSizeW; k++) {
                 if (argRemoveTeam == TileStatus::ALLY) {
                     if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                        mFieldDataHistory.back().allyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                        mFieldDataHistory.back().allyScore.area -= abs(mFieldPointsArray[j][k]);
                     }
                 }
                 else if (argRemoveTeam == TileStatus::ENEMY) {
                     if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
-                        mFieldDataHistory.back().enemyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                        mFieldDataHistory.back().enemyScore.area -= abs(mFieldPointsArray[j][k]);
                     }
                 }
             }
@@ -931,10 +932,10 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
                 for (int k = 0; k < mFieldSizeW; k++) {
                     if (!mFieldDataHistory.back().fieldAllyAreaSquaresArray[j][k] && areaSquares[j][k]) {
                         if (argRemoveTeam == TileStatus::ALLY) {
-                            mFieldDataHistory.back().allyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                            mFieldDataHistory.back().allyScore.area += abs(mFieldPointsArray[j][k]);
                         }
                         else if (argRemoveTeam == TileStatus::ENEMY) {
-                            mFieldDataHistory.back().enemyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
+                            mFieldDataHistory.back().enemyScore.area += abs(mFieldPointsArray[j][k]);
                         }
                     }
                 }
@@ -965,18 +966,18 @@ void Field::putTile(const int argX, const int argY, const int argTileStatus) {
     if (mCurrentAgentID > 0) {          // 味方エージェント
         if (mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX]) {
             mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY][argX] = false;
-            mFieldDataHistory.back().allyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[argY][argX]);
+            mFieldDataHistory.back().allyScore.area -= abs(mFieldPointsArray[argY][argX]);
         }
             
-        mFieldDataHistory.back().allyScore.tile += mFieldDataHistory.back().fieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
+        mFieldDataHistory.back().allyScore.tile += mFieldPointsArray[argY][argX];       // タイルポイントにマスの得点を加算
     }
     else if (mCurrentAgentID < 0) {     // 相手エージェント
         if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX]) {
             mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY][argX] = false;
-            mFieldDataHistory.back().enemyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[argY][argX]);
+            mFieldDataHistory.back().enemyScore.area -= abs(mFieldPointsArray[argY][argX]);
         }
             
-        mFieldDataHistory.back().enemyScore.tile += mFieldDataHistory.back().fieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
+        mFieldDataHistory.back().enemyScore.tile += mFieldPointsArray[argY][argX];      // タイルポイントにマスの得点を加算
     }
     else {                              // どちらでもない（エージェントが選択されていない）
         return;
@@ -1025,7 +1026,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 
                 mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
                 mFieldDataHistory.back().fieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
-                mFieldDataHistory.back().allyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argBeforeY][argBeforeX];
+                mFieldDataHistory.back().allyScore.tile -= mFieldPointsArray[argBeforeY][argBeforeX];
                 
                 argBeforeX = mFieldData.allyAgentsPosition[mCurrentAgentID-1].first;
                 argBeforeY = mFieldData.allyAgentsPosition[mCurrentAgentID-1].second;
@@ -1046,7 +1047,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 
                 mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
                 mFieldDataHistory.back().fieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
-                mFieldDataHistory.back().enemyScore.tile -= mFieldDataHistory.back().fieldPointsArray[argBeforeY][argBeforeX];
+                mFieldDataHistory.back().enemyScore.tile -= mFieldPointsArray[argBeforeY][argBeforeX];
                 
                 argBeforeX = mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].first;
                 argBeforeY = mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].second;

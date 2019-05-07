@@ -68,7 +68,6 @@ typedef struct Score {
  @var enemyScore                    相手チームの得点（Score構造体）
  */
 typedef struct fieldDataStruct {
-    vector<vector<int>> fieldPointsArray;              // フィールドの点数格納用
     vector<vector<int>> fieldStatusArray;              // フィールドの状況格納用
     vector<vector<int>> fieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
     vector<vector<bool>> fieldAllyAreaSquaresArray;    // 味方の領域の格納用

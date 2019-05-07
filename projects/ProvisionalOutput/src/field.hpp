@@ -89,8 +89,8 @@ public:
     void setSolvingWithChangeTurn(bool argBool);
     
 private:
-    /*
     vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
+    /*
     vector<vector<int>> mFieldStatusArray;              // フィールドの状況格納用
     vector<vector<int>> mFieldAgentsIDArray;            // フィールド上のエージェントの場所の格納用
     vector<vector<bool>> mFieldAllyAreaSquaresArray;    // 味方の領域の格納用
