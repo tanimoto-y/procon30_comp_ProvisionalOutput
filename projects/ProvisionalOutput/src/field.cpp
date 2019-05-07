@@ -1009,7 +1009,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         int beforeCurrentX = argBeforeX, beforeCurrentY = argBeforeY;
         
         // 最後の操作履歴と前回のターンでのエージェントの位置が一致しない（=1回以上同一ターン内で同じエージェントを移動させた）場合
-        // 最後の操作履歴を削除し、2つ前の操作履歴に戻す
+        // 一つ前の操作を取り消す
         if (mCurrentAgentID > 0) {
             // 同じエージェントが同じターン内の前回の操作で除去を行っていた場合
             if (mFieldDataHistory.size() > 2) {
@@ -1019,8 +1019,9 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 }
             }
             
-            if (mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].first  != mFieldData.allyAgentsPosition[mCurrentAgentID-1].first ||
-                mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].second != mFieldData.allyAgentsPosition[mCurrentAgentID-1].second) {
+            if ((mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].first  != mFieldData.allyAgentsPosition[mCurrentAgentID-1].first ||
+                 mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].second != mFieldData.allyAgentsPosition[mCurrentAgentID-1].second) &&
+                 mFieldData.fieldStatusArray[argBeforeY][argBeforeX] != mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX]) {
                 
                 mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
                 mFieldDataHistory.back().fieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
@@ -1039,8 +1040,9 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 }
             }
             
-            if (mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].first  != mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].first ||
-                mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].second != mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].second) {
+            if ((mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].first  != mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].first ||
+                 mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].second != mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].second) &&
+                 mFieldData.fieldStatusArray[argBeforeY][argBeforeX] != mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX]) {
                 
                 mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
                 mFieldDataHistory.back().fieldAgentsIDArray[argBeforeY][argBeforeX] = 0;
