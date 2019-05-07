@@ -996,26 +996,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
         mFieldDataHistory.push_back(mFieldDataHistory.back());
         
-        // 同じターン内で領域を成すマスからエージェントを移動させようとしたとき
-        if (mFieldDataHistory.back().fieldAreaSideLinesArray[argBeforeY][argBeforeX] &&
-            mFieldDataHistory.back().fieldStatusArray[argY][argX] == mFieldData.fieldStatusArray[argBeforeY][argBeforeX]) {
-            
-            mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] = 0;
-            
-            for (int i = 0; i < 4; i++) {
-                if (argBeforeX + gSearchTileDirections[i].x < 0 || argBeforeY + gSearchTileDirections[i].y < 0 ||
-                    argBeforeX + gSearchTileDirections[i].x > mFieldSizeW-1 || argBeforeY + gSearchTileDirections[i].y > mFieldSizeH-1) {
-                    continue;
-                }
-                
-                if (mCurrentAgentID > 0 && mFieldDataHistory.back().fieldAllyAreaSquaresArray[argBeforeY+gSearchTileDirections[i].y][argBeforeX+gSearchTileDirections[i].x]) {
-                    removeArea(argBeforeX+gSearchTileDirections[i].x, argBeforeY+gSearchTileDirections[i].y, TileStatus::ALLY);
-                }
-                else if (mCurrentAgentID < 0 && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argBeforeY+gSearchTileDirections[i].y][argBeforeX+gSearchTileDirections[i].x]) {
-                    removeArea(argBeforeX+gSearchTileDirections[i].x, argBeforeY+gSearchTileDirections[i].y, TileStatus::ENEMY);
-                }
-            }
-        }
+        int beforeCurrentX = argBeforeX, beforeCurrentY = argBeforeY;
         
         // 最後の操作履歴と前回のターンでのエージェントの位置が一致しない（=1回以上同一ターン内で同じエージェントを移動させた）場合
         // 最後の操作履歴を削除し、2つ前の操作履歴に戻す
@@ -1057,6 +1038,27 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
                 
                 argBeforeX = mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].first;
                 argBeforeY = mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].second;
+            }
+        }
+        
+        // 同じターン内で領域を成すマスからエージェントを移動させようとしたとき
+        if (mFieldDataHistory.size() > 2) {
+            if (mFieldDataHistory.back().fieldAreaSideLinesArray[beforeCurrentY][beforeCurrentX] &&
+                mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == mFieldDataHistory.end()[-3].fieldAgentsIDArray[beforeCurrentY][beforeCurrentX]) {
+                
+                for (int i = 0; i < 4; i++) {
+                    if (beforeCurrentX + gSearchTileDirections[i].x < 0 || beforeCurrentY + gSearchTileDirections[i].y < 0 ||
+                        beforeCurrentX + gSearchTileDirections[i].x > mFieldSizeW-1 || beforeCurrentY + gSearchTileDirections[i].y > mFieldSizeH-1) {
+                        continue;
+                    }
+                    
+                    if (mCurrentAgentID > 0 && mFieldDataHistory.back().fieldAllyAreaSquaresArray[beforeCurrentY+gSearchTileDirections[i].y][beforeCurrentX+gSearchTileDirections[i].x]) {
+                        removeArea(beforeCurrentX+gSearchTileDirections[i].x, beforeCurrentY+gSearchTileDirections[i].y, TileStatus::ALLY);
+                    }
+                    else if (mCurrentAgentID < 0 && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[beforeCurrentY+gSearchTileDirections[i].y][beforeCurrentX+gSearchTileDirections[i].x]) {
+                        removeArea(beforeCurrentX+gSearchTileDirections[i].x, beforeCurrentY+gSearchTileDirections[i].y, TileStatus::ENEMY);
+                    }
+                }
             }
         }
         
