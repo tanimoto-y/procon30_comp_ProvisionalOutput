@@ -562,8 +562,11 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
     if (argBeTileStatus == TileStatus::ALLY) {
         team = Team::ALLY;
     }
-    else {
+    else if (argBeTileStatus == TileStatus::ENEMY) {
         team = Team::ENEMY;
+    }
+    else {
+        return false;
     }
     
     // 領域内に指定（argDeleteArea == false）するとき
@@ -595,7 +598,7 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
         }
         
         // 領域の探索のとき すでに領域内に指定されているマスなら: continue
-        if (!argDeleteArea && (argAreaSquares[y][x] == true)) {
+        if (!argDeleteArea && argAreaSquares[y][x]) {
             continue;
         }
         
@@ -884,7 +887,14 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
  @param argRemoveTeam   除去されるチーム
  */
 void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) {
-    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
+    vector<vector<bool>> areaSquares;
+    if (argRemoveTeam == TileStatus::ALLY) {
+        areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
+    }
+    else if (argRemoveTeam == TileStatus::ENEMY) {
+        areaSquares = mFieldDataHistory.back().fieldEnemyAreaSquaresArray;
+    }
+    
     bool areThereArea = searchAreaPointsSquares(areaSquares, argX, argY, argRemoveTeam, true);
     
     if (!areThereArea) {
@@ -896,7 +906,7 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
                         mFieldDataHistory.back().allyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                     }
                 }
-                else {
+                else if (argRemoveTeam == TileStatus::ENEMY) {
                     if (mFieldDataHistory.back().fieldEnemyAreaSquaresArray[j][k] && !areaSquares[j][k]) {
                         mFieldDataHistory.back().enemyScore.area -= abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                     }
@@ -907,7 +917,7 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
         if (argRemoveTeam == TileStatus::ALLY) {
             mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
         }
-        else {
+        else if (argRemoveTeam == TileStatus::ENEMY) {
             mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
         }
         
@@ -923,7 +933,7 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
                         if (argRemoveTeam == TileStatus::ALLY) {
                             mFieldDataHistory.back().allyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                         }
-                        else {
+                        else if (argRemoveTeam == TileStatus::ENEMY) {
                             mFieldDataHistory.back().enemyScore.area += abs(mFieldDataHistory.back().fieldPointsArray[j][k]);
                         }
                     }
@@ -933,7 +943,7 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
             if (argRemoveTeam == TileStatus::ALLY) {
                 mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
             }
-            else {
+            else if (argRemoveTeam == TileStatus::ENEMY) {
                 mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
             }
         }
@@ -1105,7 +1115,8 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
         // 領域が成立するなら領域の設定も行う
-        else if (mFieldData.fieldStatusArray[argY][argX] == 0 || mFieldData.fieldStatusArray[argY][argX] == beTileStatus) {
+        else if ((mFieldData.fieldStatusArray[argY][argX] == 0 || mFieldData.fieldStatusArray[argY][argX] == beTileStatus) &&
+                 mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
             mCurrentSquarePosition = {argX, argY};
             
             // タイルを置く処理（まだタイルが置かれていない場合のみ）
