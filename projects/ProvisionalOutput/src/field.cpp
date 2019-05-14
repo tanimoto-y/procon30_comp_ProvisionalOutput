@@ -688,7 +688,7 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
         
         if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] != 0) {
-            Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/6*5, 20).draw(agentIDRectColor);
+            Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/7*6, 20).draw(agentIDRectColor);
             
             mAgentIDTextFont(U"Enemy").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
             mAgentIDTextFont((-1)*mFieldDataHistory.back().fieldAgentsIDArray[argY][argX]).draw(argSquarePosition.x+2+45, argSquarePosition.y, Color(Palette::White));
@@ -1066,7 +1066,8 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
         // 相手の領域を成すタイルなら、除去後にその領域が成立するか確認
         if (mFieldDataHistory.back().fieldStatusArray[argY][argX] == (-1)*mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] &&
-            mFieldData.fieldAgentsIDArray[argY][argX] == 0) {
+            mFieldData.fieldAgentsIDArray[argY][argX] == 0 &&
+            mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
             // タイルの除去（相手の領域を成すタイルなら、除去後にその領域が成立するか確認）
             removeTile(argX, argY, beTileStatus);
             
