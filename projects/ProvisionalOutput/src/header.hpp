@@ -137,6 +137,10 @@ namespace AgentActNumbers {
     // 座標から行動の番号を返す関数
     // Main.cpp内に動作内容あり
     int getAgentActNumber(pair<int, int> position, pair<int, int> beforePosition, bool argIsAgentRemovingTiles);
+    
+    // 行動の番号から移動/除去した座標を返す関数
+    // Main.cpp内に動作内容あり
+    pair<int, int> getAgentActDirection(int actNumber);
 }
 
 

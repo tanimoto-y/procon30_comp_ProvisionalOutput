@@ -59,7 +59,7 @@ public:
     void printSquarePoint(const Vec2 argSquarePosition, const int argX, const int argY, Color& rectColor);
     
     // エージェントの移動経路を示す矢印の表示
-    void drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY);
+    void drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY, const bool argIsTileRemoved);
     
     // タイル除去
     void removeTile(const int argX, const int argY, const int argTileStatus);

@@ -95,6 +95,39 @@ int AgentActNumbers::getAgentActNumber(pair<int, int> position, pair<int, int> b
     return actNumber;
 }
 
+pair<int, int> AgentActNumbers::getAgentActDirection(int argActNumber) {
+    pair<int, int> movedPosition;
+    
+    if (argActNumber == AgentActNumbers::STAY) {
+        movedPosition = {0, 0};
+    }
+    else if (argActNumber == AgentActNumbers::GO_UP_LEFT    || argActNumber == AgentActNumbers::REMOVE_UP_LEFT) {
+        movedPosition = {-1, -1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_UP         || argActNumber == AgentActNumbers::REMOVE_UP) {
+        movedPosition = {0, -1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_UP_RIGHT   || argActNumber == AgentActNumbers::REMOVE_UP_RIGHT) {
+        movedPosition = {1, -1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_RIGHT      || argActNumber == AgentActNumbers::REMOVE_RIGHT) {
+        movedPosition = {1, 0};
+    }
+    else if (argActNumber == AgentActNumbers::GO_DOWN_RIGHT || argActNumber == AgentActNumbers::REMOVE_DOWN_RIGHT) {
+        movedPosition = {1, 1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_DOWN       || argActNumber == AgentActNumbers::REMOVE_DOWN) {
+        movedPosition = {0, 1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_DOWN_LEFT  || argActNumber == AgentActNumbers::REMOVE_DOWN_LEFT) {
+        movedPosition = {-1, 1};
+    }
+    else if (argActNumber == AgentActNumbers::GO_LEFT       || argActNumber == AgentActNumbers::REMOVE_LEFT) {
+        movedPosition = {-1, 0};
+    }
+    
+    return movedPosition;
+}
 
 /**
  centerText:
@@ -114,6 +147,7 @@ void centerText(const String argStr, const int argLeftFRONTX, const int argLeftF
     
     argFont(argStr).draw(argLeftFRONTX+(argRightBottomX-argLeftFRONTX)/2-textLength*argFont.fontSize()/3, argLeftFRONTY+(argRightBottomY-argLeftFRONTY)/2-argFont.fontSize()/2, argColor);
 }
+
 /**
  centerText:
  引数で指定した座標の中央に文字を表示する関数。

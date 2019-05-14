@@ -454,9 +454,6 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
                         if (lineX == x && lineY == y) {
                             // 自チーム以外のタイルのカウントが1以上なら、領域を認識する
                             if (whiteTiles > 0) {
-                                //cout << "囲いを検知(" << team << "): ";
-                                //cout << searchingNode->getPosition().x << ',' << searchingNode->getPosition().y << '(' << searchingNode << ')' << endl;
-                                
                                 // 本当に囲めているか、searchAreaPointsSquares関数で確認
                                 // 確認と同時に領域への指定を仮に行う
                                 // 領域が確認できたら、areThereAreaPointsにtrue できなければfalse（ここでfalseになることはほぼありえない）
@@ -535,7 +532,7 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
 }
 
 /**
- searchAreaPointsSquares:
+ Field::searchAreaPointsSquares:
  *再帰関数
  領域と仮定したマスの探索
  Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する。
@@ -672,7 +669,9 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
         if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] != 0) {
             Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
+            
             mAgentIDTextFont(U"Ally").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
+            mAgentIDTextFont(mFieldDataHistory.back().fieldAgentsIDArray[argY][argX]).draw(argSquarePosition.x+2+30, argSquarePosition.y, Color(Palette::White));
         }
     }
     // 相手のタイルのとき
@@ -689,8 +688,10 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
         Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize, mFieldSquareSize).draw(rectColor);
         
         if (mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] != 0) {
-            Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/3*2, 20).draw(agentIDRectColor);
+            Rect(argSquarePosition.x, argSquarePosition.y, mFieldSquareSize/6*5, 20).draw(agentIDRectColor);
+            
             mAgentIDTextFont(U"Enemy").draw(argSquarePosition.x+2, argSquarePosition.y, Color(Palette::White));
+            mAgentIDTextFont((-1)*mFieldDataHistory.back().fieldAgentsIDArray[argY][argX]).draw(argSquarePosition.x+2+45, argSquarePosition.y, Color(Palette::White));
         }
     }
 }
@@ -764,7 +765,7 @@ void Field::printSquarePoint(const Vec2 argSquarePosition, const int argX, const
     }
 }
 
-void Field::drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY) {
+void Field::drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY, const bool argIsTileRemoved) {
     // 表示する矢印の決定
     Vec2 movedDirection = Vec2{argX, argY}-Vec2{argBeforeX, argBeforeY};
     String arrow;
@@ -806,7 +807,12 @@ void Field::drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const 
         return;
     }
     
-    mPointTextFontBold(arrow).draw(drawPosition.x, drawPosition.y, Color(Palette::Black));
+    if (argIsTileRemoved) {
+        mPointTextFontBold(arrow).draw(drawPosition.x, drawPosition.y, Color(Palette::Orange));
+    }
+    else {
+        mPointTextFontBold(arrow).draw(drawPosition.x, drawPosition.y, Color(Palette::Black));
+    }
 }
 
 /**
@@ -853,26 +859,6 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
                 }
                 
             }
-            /*
-            else {
-                if (mCurrentAgentID > 0) {
-                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldAllyAreaSquaresArray;
-                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ALLY, false);
-                    
-                    if (areThereArea) {
-                        mFieldDataHistory.back().fieldAllyAreaSquaresArray = areaSquares;
-                    }
-                }
-                else if (mCurrentAgentID < 0) {
-                    vector<vector<bool>> areaSquares = mFieldDataHistory.back().fieldEnemyAreaSquaresArray;
-                    bool areThereArea = searchAreaPointsSquares(areaSquares, argX+gSearchTileDirections[i].x, argY+gSearchTileDirections[i].y, TileStatus::ENEMY, false);
-                    
-                    if (areThereArea) {
-                        mFieldDataHistory.back().fieldEnemyAreaSquaresArray = areaSquares;
-                    }
-                }
-            }
-             */
         }
     }
 }
@@ -1268,6 +1254,7 @@ void Field::draw() {
     // 一番上に表示させたいため、もう一度ループ
     for (int y = 0; y < mFieldSizeH; y++) {
         for (int x = 0; x < mFieldSizeW; x++) {
+            // 移動
             if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] != 0) {
                 for (int i = 0; i < 8; i++) {
                     if (x+gMoveDirections[i].x < 0 || y+gMoveDirections[i].y < 0 ||
@@ -1276,8 +1263,25 @@ void Field::draw() {
                     }
                     
                     if (mFieldData.fieldAgentsIDArray[y+gMoveDirections[i].y][x+gMoveDirections[i].x] == mFieldDataHistory.back().fieldAgentsIDArray[y][x]) {
-                        drawArrow(Vec2{mFieldLeftmostPoint+x*mFieldSquareSize, mFieldTopmostPoint+y*mFieldSquareSize}, x+gMoveDirections[i].x, y+gMoveDirections[i].y, x, y);
+                        drawArrow(Vec2{mFieldLeftmostPoint+x*mFieldSquareSize, mFieldTopmostPoint+y*mFieldSquareSize}, x+gMoveDirections[i].x, y+gMoveDirections[i].y, x, y, false);
                     }
+                }
+            }
+            
+            // 除去
+            int agentIDNumber = mFieldDataHistory.back().fieldAgentsIDArray[y][x];
+            if (agentIDNumber > 0) {
+                if (mFieldDataHistory.back().allyAgentsActNumbers[agentIDNumber-1] >= AgentActNumbers::REMOVE_UP_LEFT &&
+                    mFieldData.allyAgentsActNumbers[agentIDNumber-1] < AgentActNumbers::REMOVE_UP_LEFT) {
+                    pair<int, int> removedTilePosition = AgentActNumbers::getAgentActDirection(mFieldDataHistory.back().allyAgentsActNumbers[agentIDNumber-1]);
+                    drawArrow(Vec2{mFieldLeftmostPoint+(x+removedTilePosition.first)*mFieldSquareSize, mFieldTopmostPoint+(y+removedTilePosition.second)*mFieldSquareSize}, x, y, x+removedTilePosition.first, y+removedTilePosition.second, true);
+                }
+            }
+            else if (agentIDNumber < 0) {
+                if (mFieldDataHistory.back().enemyAgentsActNumbers[(-1)*agentIDNumber-1] >= AgentActNumbers::REMOVE_UP_LEFT &&
+                    mFieldData.enemyAgentsActNumbers[(-1)*agentIDNumber-1] < AgentActNumbers::REMOVE_UP_LEFT) {
+                    pair<int, int> removedTilePosition = AgentActNumbers::getAgentActDirection(mFieldDataHistory.back().enemyAgentsActNumbers[(-1)*agentIDNumber-1]);
+                    drawArrow(Vec2{mFieldLeftmostPoint+(x+removedTilePosition.first)*mFieldSquareSize, mFieldTopmostPoint+(y+removedTilePosition.second)*mFieldSquareSize}, x, y, x+removedTilePosition.first, y+removedTilePosition.second, true);
                 }
             }
         }
