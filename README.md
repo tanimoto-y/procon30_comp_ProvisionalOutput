@@ -5,9 +5,9 @@
 
 ## 動作確認環境
 - macOS 10.14 mojave (64bit)
-  - Xcode 10.2.1
+- Xcode 10.2.1
 - Windows 10 (64bit)
-  - Visual Studio 2019
+- Visual Studio 2019
 
 ## 使用環境
 - C++
@@ -34,7 +34,7 @@ https://scrapbox.io/Siv3D/OpenSiv3D_%E3%82%92%E3%81%AF%E3%81%98%E3%82%81%E3%82%8
 https://visualstudio.microsoft.com/ja/downloads/
 2. インストーラを起動して、「C++ によるデスクトップ開発」を選択し、インストールします。
 3. インストールが完了したら、OpenSiv3D SDKをダウンロードし、インストールします。
-  https://siv3d.jp/downloads/Siv3D/OpenSiv3D(0.3.2)Installer.exe
+https://siv3d.jp/downloads/Siv3D/OpenSiv3D(0.3.2)Installer.exe
 
 ### ビルド方法
 Macの場合はXcodeで使用してください（CLionだと導入が難しい）。  
@@ -48,6 +48,40 @@ OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、
 #### Visual Studioでビルドする場合
 1. `procon30_comp_ProvisionalOutput/for_VisualStudio/procon30_comp_ProvisionalOutput.sln`をVisual Studioで開く。
 2. CtrlとF5を同時に押すか、または画面上部の「▶ローカル Windowsデバッガー」を押す。
+
+## 使い方
+### エージェントの選択
+起動すると、フィールドがで表示されます。  
+フィールドは現在のところ変更不可ですが、近い内に変更できるようにします。  
+エージェントがいるマスには、マスの上側に、味方エージェントなら「Ally」相手エージェントなら「Enemy」と表示され、その後ろにエージェントの番号が続きます。  
+エージェントの番号は自動で割り振られ、Fieldかクラス内の配列では、この順番通りにエージェントの情報が格納されます（要素番号は エージェント番号-1 で、0から始まる）。  
+エージェントがいるマスの上で左クリックすると、エージェントが選択されます。  
+エージェントが選択されると、マスの枠がオレンジ色になります。  
+### エージェントの移動＆タイルの設置
+エージェントのを選択したあと、エージェントの周囲8方向のマスを選択すると、エージェントが移動します。  　
+このとき、相手チームのタイルがあるマスやエージェントがいるマスには移動できません。  
+移動すると、自動的にタイルが設置されます。
+### タイルの除去
+エージェントの周囲8方向のマスにのうち、相手チームのタイルがあるマスを選択すると、相手チームのタイルを除去します。    　
+
+また、味方チームのタイルを除去したい場合は、味方チームのタイルがあるマスを右クリックします。
+### 領域ポイントについて
+領域が成立すると、領域ポイントが得点に加算されます。  
+領域内のマスは薄い色で塗られます。
+### 得点の見方
+左右端にある数字が得点です。右側の「Ally」が味方チーム、左側の「Enemy」が相手チームです。  
+大きく表示されている数値が総得点で、その下の数値がタイルポイントと領域ポイントです。  
+「タイル」「領域」の隣の●の色は、相手チームに比べて点数が高いか、低いかによって変わります。  
+グレー：同点  
+緑色：勝ち  
+橙色 : 負け  
+### ターン切り替え
+ターンを切り替えるには、左下にある「確定」ボタンを押します。  
+現在のターン数は、画面左上に表示されます。
+### 探索の開始
+探索を行う際は、右下にある「探索」ボタンを押します。  
+探索は1ターンに付き1回まで行えます。  
+また、「確定」ボタンの下にある「確定と同時に探索」に✓を入れると、確定ボタンが押された時に探索も行います。
 
 ## 定数・構造体・名前空間の説明
 定数と構造体はheader.hppで定義しています。  
@@ -117,7 +151,7 @@ OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、
 使用例）右に移動 : AgentActNumbers::GOTO_RIGHT  
 番号は以下の規定に従います:  
 - とどまる : STAY = 0  
-  
+
 - 移動 左上 : GO\_UP\_LEFT = 1  
 - 移動 上 : GO_UP = 2  
 - 移動 右上 : GO\_UP\_RIGHT = 3  
@@ -126,7 +160,7 @@ OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、
 - 移動 下 : GO_DOWN = 6  
 - 移動 左下 : GO\_DOWN\_LEFT = 7  
 - 移動 左 : GO_LEFT = 8  
-  
+
 - 除去 左上 : REMOVE\_UP\_LEFT = 9  
 - 除去 上 : REMOVE_UP = 10  
 - 除去 右上 : REMOVE\_UP\_RIGHT = 11  
@@ -149,7 +183,7 @@ OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、
 
 #### centerText
 指定した座標の中央に文字を表示します。文字列用と数値用があります。
-  
+
 - const String argStr       : 表示する文字列（文字列用）  
 - const int argInt          : 表示する数値（数値用）  
 - const int argLeftTopX     : 左上のx座標  
@@ -161,7 +195,7 @@ OpenSiv3DはXcodeまたはVisual Studio 2019で使うことが前提なので、
 
 #### printTotalPoints
 点数を表示します。  
-  
+
 - const Team::Type argTeam            : どちらのチームを表示するか（Team::ALLY or Team::ENEMY）  
 - const bool argTeamColor             : チームの色（TeamColor::RED or TeamColor::BLUE）  
 - Field& argFieldData                 : フィールドクラスのポインタ  
@@ -181,63 +215,64 @@ Main関数です。ここからそれぞれの関数を呼び出します。
 - vector&lt;vector&lt;bool&gt;&gt; mFieldAllyAreaSquaresArray     : 味方の領域(領域内のマスはtrue, 外のマスはfalse)  
 - vector&lt;vector&lt;bool&gt;&gt; mFieldEnemyAreaSquaresArray   : 相手の領域(領域内のマスはtrue, 外のマスはfalse)  
 - vector&lt;vector&lt;bool&gt;&gt; mFieldAreaSideLinesArray      : 領域を成す辺（辺を成すマスはtrue, それ以外はfalse）  
-  
+
 - vector&lt;int&gt; mAllyAgentsActNumbers              : 味方エージェントの行動の番号  
 - vector&lt;int&gt; mEnemyAgentsActNumbers             : 相手エージェントの行動の番号  
-    
+
 - Score mAllyScore                              : 味方チームの得点（合計点: mAllyScore.total, タイルポイント: mAllyScore.tile, 領域ポイント: mAllyScore.area）  
 - Score mEnemyScore                              : 相手チームの得点（合計点: mEnemyScore.total, タイルポイント: mEnemyScore.tile, 領域ポイント: mEnemyScore.area）  
-  
+
 - int mFieldSizeW, mFieldSizeH                    : フィールドの大きさ（wは横、hは縦）  
 - int mFieldLineLengthW, mFieldLineLengthH        : フィールドの枠の長さ  
 - int mFieldSquareSize                            : フィールドの1マスあたりの大きさ（正方形）  
-  
+
 - int mTotalTeamAgents                            : 各チームのエージェントの総数  
-  
+
 - int mFieldLeftmostPoint                         : フィールドの描画範囲の左端の座標  
 - int mFieldRightmostPoint                        : フィールドの描画範囲の右端の座標  
 - int mFieldTopmostPoint                          : フィールドの描画範囲の上端の座標  
 - int mFieldBottommostPoint                       : フィールドの描画範囲の下端の座標  
-  
+
 - bool mAllyTeamColor                             : 味方チームの色（敵チームの色は!allyTeamColorで取得できる）  
-  
+
 - Vec2 mCurrentSquarePosition                     : 選択されているマスの座標（選択されていなければ(-1, -1)）  
 - int mCurrentAgentID                             : 選択されているマスにいるエージェントのID（選択されていなければ 0）  
-  
+
 - bool mMousePressing                             : マウスが押されている間はtrue  
-  
+
 - Font mPointTextFont                             : 点数表示用のフォント  
 - Font mPointTextFontBold                         : 点数表示用の太字フォント  
 - Font mAgentIDTextFont                           : エージェントID表示用のフォント  
-  
+
 - int mBigPointsBorder                            : 大きい点数の基準（この値を超えると太字で点数を表示する）
-    
+
 #### Field::Field
 Fieldクラスのコンストラクタです。フィールドの初期化を行います。
-  
+
 - const vector&lt;vector&lt;int&gt;&gt; &argFieldPointsArray    : フィールドの得点の配列  
 - const vector&lt;vector&lt;int&gt;&gt; &argFieldStatusArray    : フィールドの状態を示す配列  
 - const Vec2 position                               : フィールドの大きさを示す配列（例：Vec2{10, 10}）  
 - const bool argAllyTeamColor                       : 味方チームの色（TeamColor::RED or TeamColor::BLUE）
-    
+
 #### void Field::setField
 フィールドの得点、状況をプライベート配列にコピーし、エージェントにIDを振り分けます。  
 IDはフィールドの左上から順に振り分けられ、味方のエージェントのIDは1から上がっていき、相手のエージェントのIDは-1から下がっていきます。  
 この関数は、基本的にFieldコンストラクタから呼び出されます。  
 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3  
-  
+
 - const vector&lt;vector&lt;int&gt;&gt; &argFieldPointsArray    : フィールドの得点の配列  
 - const vector&lt;vector&lt;int&gt;&gt; &argFieldStatusArray    : フィールドの状態を示す配列
-    
+
 #### void Field::searchAreaPointsSide
 再帰関数です。  
 フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定します。  
 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定します。  
 その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定します。  
-  
+
 - vector&lt;vector&lt;bool&gt;&gt; argFieldMark     : フィールドの領域に認定したかどうか（一時的な配列）  
 - const int argStartX                   : 領域探索の始点のマスのx座標  
 - const int argStartY                   : 領域探索の始点のマスのy座標  
 - const int argX                        : 現在探索中のマスのx座標  
 - const int argY                        : 現在探索中のマスのy座標  
 - Node* argParentNode                   : 親ノードのポインタ  
+
