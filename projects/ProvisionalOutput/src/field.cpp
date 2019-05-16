@@ -3,7 +3,7 @@
 // コンストラクタ（初期化も行う）
 /**
  Field::Field
- Fieldクラスのコンストラクタ（初期化も行う）。
+    Fieldクラスのコンストラクタ（初期化も行う）。
  
  @param argFieldPointsArray フィールドの得点の配列
  @param argFieldStatusArray フィールドの状態を示す配列
@@ -50,11 +50,11 @@ Field::Field(const vector<vector<int>> &argFieldPointsArray, const vector<vector
 
 /**
  Field::setField
- フィールドの設定を行う。
- フィールドの得点、状況をプライベート配列にコピーし、エージェントにIDを振り分ける。
- IDはフィールドの左上から順に振り分けられ、味方のエージェントのIDは1から上がっていき、相手のエージェントのIDは-1から下がっていく。
- この関数は、基本的にFieldコンストラクタから呼び出される。
- 例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3
+    フィールドの設定を行う。
+    フィールドの得点、状況をプライベート配列にコピーし、エージェントにIDを振り分ける。
+    IDはフィールドの左上から順に振り分けられ、味方のエージェントのIDは1から上がっていき、相手のエージェントのIDは-1から下がっていく。
+    この関数は、基本的にFieldコンストラクタから呼び出される。
+    例）エージェントが各チーム3人のとき、味方のエージェントIDは1〜3、相手のエージェントIDは-1〜-3
  
  @param argFieldPointsArray フィールドの得点の配列
  @param argFieldStatusArray フィールドの状態を示す配列
@@ -133,20 +133,18 @@ void Field::decision() {
     // 探索をリセット
     mSolvedPerTurn = false;
     
-    // mSolvingWithChangeTurn == trueなら、探索も行う
+    // mSolvingWithChangeTurn == trueなら、探索も行う(startSolving関数)
     if (mSolvingWithChangeTurn) {
         startSolving();
     }
-    
-    cout << "------------------" << endl;
 }
 
 /**
  Field::getAgentsPosition:
- フィールドからエージェントの位置を取得する。
- 要素番号はエージェントIDと同じで、相手のエージェントの場合はエージェントIDの絶対値が要素番号になる。
- 例: 相手の1人目のエージェント（エージェントID -1）のx座標 -> argEnemyAgentsPosition[1].first
- 各配列は参照渡しであるため、この関数を実行することで自動的に座標が代入される。
+    フィールドからエージェントの位置を取得する。
+    要素番号はエージェントIDと同じで、相手のエージェントの場合はエージェントIDの絶対値が要素番号になる。
+    例: 相手の1人目のエージェント（エージェントID -1）のx座標 -> argEnemyAgentsPosition[1].first
+    各配列は参照渡しであるため、この関数を実行することで自動的に座標が代入される。
 
  @param argAllyAgentsPosition  味方のエージェントの座標配列
  @param argEnemyAgentsPosition 相手のエージェントの座標配列
@@ -175,7 +173,7 @@ void Field::getAgentsPosition(vector<pair<int, int>> &argAllyAgentsPosition, vec
 
 /**
  Field::getTotalTeamAgents:
- 各チームのエージェントの人数を返す
+    各チームのエージェントの人数を返す
 
  @return 各チームのエージェントの人数
  */
@@ -185,7 +183,7 @@ int Field::getTotalTeamAgents() {
 
 /**
  Field::getFieldSquareSize:
- フィールドの1マスの大きさ（mFieldSquareSize）を返す。
+    フィールドの1マスの大きさ（mFieldSquareSize）を返す。
  
  @return mFieldSquareSize（フィールドの1マスの大きさ）
  */
@@ -195,7 +193,7 @@ int Field::getFieldSquareSize() {
 
 /**
  Field::getTotalPoints:
- 合計得点(mFieldDataHistory.back().allyScore.total, mFieldDataHistory.back().enemyScore.total)を返す。
+    合計得点(mFieldDataHistory.back().allyScore.total, mFieldDataHistory.back().enemyScore.total)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 合計得点
@@ -211,7 +209,7 @@ int Field::getTotalPoints(const Team::Type argTeam) {
 
 /**
  Field::getTilePoints:
- タイルポイント(mFieldDataHistory.back().allyScore.tile, mFieldDataHistory.back().enemyScore.tile)を返す。
+    タイルポイント(mFieldDataHistory.back().allyScore.tile, mFieldDataHistory.back().enemyScore.tile)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return タイルポイント
@@ -227,7 +225,7 @@ int Field::getTilePoints(const Team::Type argTeam) {
 
 /**
  Field::getAreaPoints:
- 領域ポイント(mFieldDataHistory.back().allyScore.area, mFieldDataHistory.back().enemyScore.area)を返す。
+    領域ポイント(mFieldDataHistory.back().allyScore.area, mFieldDataHistory.back().enemyScore.area)を返す。
  
  @param argTeam 得点を取得したいチームの番号(味方 Team::ALLY, 相手 Team::ENEMY)
  @return 領域ポイント
@@ -243,7 +241,7 @@ int Field::getAreaPoints(const Team::Type argTeam) {
 
 /**
  Field::setFont:
- Fieldクラスで使うフォントの設定
+    Fieldクラスで使うフォントの設定
  
  @param argPointTextFont¥       普通のフォント
  @param argPointTextFontBold    太字のフォント
@@ -274,11 +272,11 @@ bool Field::isCursorOnTheSquare(const Vec2 argPosition) {
 
 /**
  Field::searchAreaPointsSide:
- *再帰関数
- フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定する。
- 引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定する。
- その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定する。
- 領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する。
+    *再帰関数
+    フィールド上に領域が存在するかどうかを判断し、存在したら領域ポイントを設定する。
+    引数で指定した座標のタイルから同じ色のタイルをたどっていき、同じタイルを二度通ることなく最初のタイルまで戻ってこられたら、フィールド上に領域が存在すると仮定する。
+    その後、領域と仮定したタイルの間に、相手チームあるいは白いタイルが存在するか調査し、存在したら領域として認定する。
+    領域の存在が認められたら、searchAreaPointsSquaresで領域内のマスに領域内であることを設定する。
  
  @param argFieldMark    フィールドの領域に認定したかどうか（一時的な配列）
  @param argStartX       領域探索の始点のマスのx座標
@@ -533,15 +531,15 @@ void Field::searchAreaPointsSide(vector<vector<bool>> argFieldMark, const int ar
 
 /**
  Field::searchAreaPointsSquares:
- *再帰関数
- 領域と仮定したマスの探索
- Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する。
- あるいは領域を成すタイルが相手に除去された時に、その後も領域が成立するかどうか確認する。
- 走査線は4方向に移動しながら調査する。
- 走査線が同じチームのタイルにぶつかるまで探索を続け、
- 同じチームのタイルにぶつかることなくフィールドの外に走査線が出たら、領域が成立しないと判断する。
- フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める。
- 領域が成立するならtrue, 成立しないならfalseを返す。
+    *再帰関数
+    領域と仮定したマスの探索
+    Field::searchAreaPointsSideで領域が存在すると仮定したあとに、本当に領域が存在するか確認する。
+    あるいは領域を成すタイルが相手に除去された時に、その後も領域が成立するかどうか確認する。
+    走査線は4方向に移動しながら調査する。
+    走査線が同じチームのタイルにぶつかるまで探索を続け、
+    同じチームのタイルにぶつかることなくフィールドの外に走査線が出たら、領域が成立しないと判断する。
+    フィールドの外に出ることなく、すべての走査線が同じチームのタイルにぶつかったら、領域が成立することを認める。
+    領域が成立するならtrue, 成立しないならfalseを返す。
  
  @param argAreaSquares  領域にマスが含まれているかどうかを示す一時的な配列
  @param argStartX       領域探索の始点のマスのx座標
@@ -630,9 +628,9 @@ bool Field::searchAreaPointsSquares(vector<vector<bool>> &argAreaSquares, const 
 
 /**
  Field::searchAreaPoints:
- 領域が存在するか確認する。
- この関数は、再帰関数であるsearchAreaPointsSideの呼び出し用の関数で、
- この関数自体は領域の探索を行わない。
+    領域が存在するか確認する。
+    この関数は、再帰関数であるsearchAreaPointsSideの呼び出し用の関数で、
+    この関数自体は領域の探索を行わない。
  
  @param argStartX 領域探索の始点のマスのx座標
  @param argStartY 領域探索の始点のマスのy座標
@@ -644,7 +642,7 @@ void Field::searchAreaPoints(const int argStartX, const int argStartY) {
 
 /**
  Field::fillSquare:
- マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
+    マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
  
  @param argSquarePosition   マスの描画位置 Vec2型
  @param argX                マスのx座標
@@ -698,7 +696,7 @@ void Field::fillSquare(const Vec2 argSquarePosition, const int argX, const int a
 
 /**
  Field::fillAreaSquare:
- 領域マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
+    領域マスを塗りつぶす（データ上で塗りつぶすのではなく、塗りつぶしたマスを描画する）
  
  @param argSquarePosition   マスの描画位置 Vec2型
  @param argX                マスのx座標
@@ -740,7 +738,7 @@ void Field::fillAreaSquare(const Vec2 argSquarePosition, const int argX, const i
 
 /**
  Field::printSquarePoint:
- タイル点数の表示
+    タイル点数の表示
  
  @param argSquarePosition   表示するマスの描画位置 Vec2型
  @param argX                表示するマスのx座標
@@ -817,22 +815,24 @@ void Field::drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const 
 
 /**
  Field::removeTile:
- タイルを除去する。
- また、領域を成すタイルを除去する場合は、
- 除去後に領域が成立するか確認するため、searchAreaPointsSquare関数を呼び出す。
+    タイルを除去する。
+    また、領域を成すタイルを除去する場合は、
+    除去後に領域が成立するか確認するため、searchAreaPointsSquare関数を呼び出す。
  
  @param argX            タイルを除去するマスのx座標
  @param argY            タイルを除去するマスのy座標
  @param argTileStatus   タイルを除去するチームのTileStatus（除去されるチームではない）
  */
-void Field::removeTile(const int argX, const int argY, const int argTileStatus) {
-    mFieldDataHistory.back().fieldStatusArray[argY][argX] = 0;
+void Field::removeTile(const int argX, const int argY) {
+    mFieldDataHistory.back().fieldStatusArray[argY][argX] = TileStatus::NONE;
     
-    // 相手から点数を引く
-    if (mCurrentAgentID > 0) {
+    int tileStatus = mFieldData.fieldStatusArray[argY][argX];
+    
+    // タイル分の点数を引く
+    if (tileStatus == TileStatus::ENEMY) {
         mFieldDataHistory.back().enemyScore.tile -= mFieldPointsArray[argY][argX];
     }
-    else {
+    else if (tileStatus == TileStatus::ALLY) {
         mFieldDataHistory.back().allyScore.tile -= mFieldPointsArray[argY][argX];
     }
     
@@ -845,8 +845,8 @@ void Field::removeTile(const int argX, const int argY, const int argTileStatus) 
         
         // 領域の辺を成すタイルなら、除去後も領域が成立するか確認
         // 成立しなければ、領域を解除する
-        if ((argTileStatus == TileStatus::ENEMY && mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
-            (argTileStatus == TileStatus::ALLY && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
+        if ((tileStatus == TileStatus::ENEMY && mFieldDataHistory.back().fieldAllyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x]) ||
+            (tileStatus == TileStatus::ALLY && mFieldDataHistory.back().fieldEnemyAreaSquaresArray[argY+gSearchTileDirections[i].y][argX+gSearchTileDirections[i].x])) {
             if (mFieldDataHistory.back().fieldAreaSideLinesArray[argY][argX]) {
                 
                 // 味方チームのエージェントが相手チームのタイルを除去するとき
@@ -939,8 +939,8 @@ void Field::removeArea(const int argX, const int argY, const int argRemoveTeam) 
 
 /**
  Field::putTile:
- タイルを置く。
- また、領域ポイントの存在を確認するため、searchAreaPoints関数を呼び出す。
+    タイルを置く。
+    また、領域ポイントの存在を確認するため、searchAreaPoints関数を呼び出す。
 
  @param argX            タイルを置くマスのx座標
  @param argY            タイルを置くマスのy座標
@@ -975,11 +975,11 @@ void Field::putTile(const int argX, const int argY, const int argTileStatus) {
 
 /**
  Field::agenrMovement:
- エージェントの行動
- エージェントの移動、タイル設置(Field::putTile関数内)、タイルの除去(Field::removeTile関数内)などを行う。
- タイル設置時には、領域が成立するかも確認する(Field::searchAreaPoints関数内)。
- 相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
- 最後に、エージェントの行動の番号を返す。
+    エージェントの行動
+    エージェントの移動、タイル設置(Field::putTile関数内)、タイルの除去(Field::removeTile関数内)などを行う。
+    タイル設置時には、領域が成立するかも確認する(Field::searchAreaPoints関数内)。
+    相手チームの領域の辺を成すタイルを除去するときは、相手チームの領域の解除ができるかどうかも調べる。
+    最後に、エージェントの行動の番号を返す。
  
  @param argX        エージェントの移動先のマスのx座標
  @param argY        エージェントの移動先のマスのy座標
@@ -987,7 +987,7 @@ void Field::putTile(const int argX, const int argY, const int argTileStatus) {
  @param argBeforeY  エージェントの移動前のマスのy座標
  @return エージェントの行動の番号（0~16）　field.hppのAgentActNumbersに定義済み
  */
-int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
+int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY, bool argRemoveTile) {
     int actNumber = 0;      // 行動の番号
     
     if (Vec2{argY, argX} != Vec2{-1, -1}) {
@@ -1064,20 +1064,33 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
         int beTileStatus = mFieldData.fieldStatusArray[argBeforeY][argBeforeX];   // 捜査対象のエージェントのチームのStatus
         
         // （動かすエージェントから見て）相手のタイルなら タイルを除去
-        // 相手の領域を成すタイルなら、除去後にその領域が成立するか確認
-        if (mFieldDataHistory.back().fieldStatusArray[argY][argX] == (-1)*mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] &&
-            mFieldData.fieldAgentsIDArray[argY][argX] == 0 &&
-            mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
+        if (!argRemoveTile &&
+            mFieldDataHistory.back().fieldStatusArray[argY][argX] == (-1)*mFieldDataHistory.back().fieldStatusArray[argBeforeY][argBeforeX] &&
+            mFieldData.fieldAgentsIDArray[argY][argX] == 0 && mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
+            
             // タイルの除去（相手の領域を成すタイルなら、除去後にその領域が成立するか確認）
-            removeTile(argX, argY, beTileStatus);
+            removeTile(argX, argY);
             
             // 返す行動番号の取得
             actNumber = AgentActNumbers::getAgentActNumber(pair{argX, argY}, pair{argBeforeX, argBeforeY}, true);
+            
+        }
+        // argRemoveTile == trueの場合も タイルを除去
+        else if (argRemoveTile && mFieldDataHistory.back().fieldStatusArray[argY][argX] != TileStatus::NONE) {
+            
+            // タイルの除去（相手の領域を成すタイルなら、除去後にその領域が成立するか確認）
+            removeTile(argX, argY);
+            
+            // 返す行動番号の取得
+            actNumber = AgentActNumbers::getAgentActNumber(pair{argX, argY}, pair{argBeforeX, argBeforeY}, true);
+            
         }
         // それ以外ならマスにエージェントを移動させタイルを置く
         // 領域が成立するなら領域の設定も行う
         else if ((mFieldData.fieldStatusArray[argY][argX] == 0 || mFieldData.fieldStatusArray[argY][argX] == beTileStatus) &&
-                 mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0) {
+                 mFieldDataHistory.back().fieldAgentsIDArray[argY][argX] == 0 &&
+                 !argRemoveTile) {
+            
             mCurrentSquarePosition = {argX, argY};
             
             // タイルを置く処理（まだタイルが置かれていない場合のみ）
@@ -1102,6 +1115,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
             
             // 返す行動番号の取得
             actNumber = AgentActNumbers::getAgentActNumber(pair{argX, argY}, pair{argBeforeX, argBeforeY}, false);
+            
         }
     }
     
@@ -1120,7 +1134,7 @@ int Field::agentMovement(int argX, int argY, int argBeforeX, int argBeforeY) {
 
 /**
  Field::setCurrentAgent:
- 選択するエージェントの変更処理
+    選択するエージェントの変更処理
  
  @param argX カーソルで選択されたx座標
  @param argY カーソルで選択されたy座標
@@ -1141,7 +1155,7 @@ void Field::setCurrentAgent(int argX, int argY) {
 
 /**
  Field::drawSquares:
- フィールドの縦線・横線の描画
+    フィールドの縦線・横線の描画
  */
 void Field::drawSquares() {
     for (int x = 0; x < mFieldSizeW; x++) {
@@ -1156,7 +1170,7 @@ void Field::drawSquares() {
 
 /**
  Field::draw:
- フィールドの描画
+    フィールドの描画
  */
 void Field::draw() {
     Color rectColor;
@@ -1192,10 +1206,13 @@ void Field::draw() {
             if (isCursorOnTheSquare(Vec2(mFieldLeftmostPoint+x*mFieldSquareSize, mFieldTopmostPoint+y*mFieldSquareSize))) {
                 // マウスが左クリックの状態かつ 選択されていたマスから移動できるマスならば、選択されているマスに設定
                 // エージェントを選択されているマスに移動
-                if (MouseL.pressed() && !mMousePressing) {
-                    mMousePressing = true;      // 左クリックが押された瞬間だけ
+                const bool mouseLPressed = MouseL.pressed();
+                const bool mouseRPressed = MouseR.pressed();
+                
+                if ((mouseLPressed || mouseRPressed) && !mMousePressing) {
+                    mMousePressing = true;      // クリックされた瞬間だけtrue
                     
-                    if (mFieldDataHistory.back().fieldAgentsIDArray[y][x] != mCurrentAgentID && mFieldDataHistory.back().fieldAgentsIDArray[y][x] != 0) {
+                    if (mouseLPressed && mFieldDataHistory.back().fieldAgentsIDArray[y][x] != mCurrentAgentID && mFieldDataHistory.back().fieldAgentsIDArray[y][x] != 0) {
                         // 新しくエージェントを選択するときの処理
                         setCurrentAgent(x, y);
                     }
@@ -1215,7 +1232,7 @@ void Field::draw() {
                                     mFieldData.allyAgentsPosition[mCurrentAgentID-1].second + gMoveDirections[i].y == y) {
                                     // エージェントの行動に反映
                                     // 移動, 削除
-                                    agentMovement(x, y, mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].first, mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].second);
+                                    agentMovement(x, y, mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].first, mFieldDataHistory.back().allyAgentsPosition[mCurrentAgentID-1].second, mouseRPressed);
                                     
                                     break;
                                 }
@@ -1226,7 +1243,7 @@ void Field::draw() {
                                     mFieldData.enemyAgentsPosition[(-1)*mCurrentAgentID-1].second + gMoveDirections[i].y == y) {
                                     // エージェントの行動に反映
                                     // 移動, 削除
-                                    agentMovement(x, y, mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].first, mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].second);
+                                    agentMovement(x, y, mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].first, mFieldDataHistory.back().enemyAgentsPosition[(-1)*mCurrentAgentID-1].second, mouseRPressed);
                                     
                                     break;
                                 }
@@ -1246,7 +1263,7 @@ void Field::draw() {
             }
         }
         
-        if (!MouseL.pressed()) {
+        if (!MouseL.pressed() && !MouseR.pressed()) {
             mMousePressing = false;
         }
     }
@@ -1319,7 +1336,7 @@ void Field::startSolving() {
         
         setCurrentAgent(mFieldData.allyAgentsPosition[i].first, mFieldData.allyAgentsPosition[i].second);
         
-        agentMovement(mFieldData.allyAgentsPosition[i].first+moveX, mFieldData.allyAgentsPosition[i].second+moveY, mFieldData.allyAgentsPosition[i].first, mFieldData.allyAgentsPosition[i].second);
+        agentMovement(mFieldData.allyAgentsPosition[i].first+moveX, mFieldData.allyAgentsPosition[i].second+moveY, mFieldData.allyAgentsPosition[i].first, mFieldData.allyAgentsPosition[i].second, false);
         
         // 相手
         moveX = rand()%3-1;
@@ -1330,10 +1347,10 @@ void Field::startSolving() {
         }
         
         setCurrentAgent(mFieldData.enemyAgentsPosition[i].first, mFieldData.enemyAgentsPosition[i].second);
-        agentMovement(mFieldData.enemyAgentsPosition[i].first+moveX, mFieldData.enemyAgentsPosition[i].second+moveY, mFieldData.enemyAgentsPosition[i].first, mFieldData.enemyAgentsPosition[i].second);
+        agentMovement(mFieldData.enemyAgentsPosition[i].first+moveX, mFieldData.enemyAgentsPosition[i].second+moveY, mFieldData.enemyAgentsPosition[i].first, mFieldData.enemyAgentsPosition[i].second, false);
     }
 }
 
-void Field::setSolvingWithChangeTurn(bool argBool) {
+void Field::setSolvingWithNextTurn(bool argBool) {
     mSolvingWithChangeTurn = argBool;
 }

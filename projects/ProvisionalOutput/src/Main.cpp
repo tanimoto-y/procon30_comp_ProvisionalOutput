@@ -217,7 +217,7 @@ void printTotalPoints(const Team::Type argTeam, const bool argTeamColor, Field& 
         }
         
         // 領域ポイントの表示
-        argFont16(U"領域").draw(WINDOW_SIZE_W-290+150+15, 230, Color(Palette::White));
+        argFont16(U"領域").draw(WINDOW_SIZE_W-290+150+7, 230, Color(Palette::White));
         argFont16Bold(argFieldData.getAreaPoints(Team::ALLY)).draw(WINDOW_SIZE_W-290+150+60, 230, Color(Palette::White));
         
         if (argFieldData.getAreaPoints(Team::ALLY) > argFieldData.getAreaPoints(Team::ENEMY)) {
@@ -273,7 +273,7 @@ void printTotalPoints(const Team::Type argTeam, const bool argTeamColor, Field& 
         }
         
         // 領域ポイントの表示
-        argFont16(U"領域").draw(50+15, 230, Color(Palette::White));
+        argFont16(U"領域").draw(50+7, 230, Color(Palette::White));
         argFont16Bold(argFieldData.getAreaPoints(Team::ENEMY)).draw(50+60, 230, Color(Palette::White));
         
         if (argFieldData.getAreaPoints(Team::ENEMY) > argFieldData.getAreaPoints(Team::ALLY)) {
@@ -439,7 +439,7 @@ void Main() {
         // チェックボックス -> ✓: ターン変更と同時に探索
         solvingCheck.draw(buttonBaseColor, buttonBaseColorUnderCursor, buttonFrameColor, font16);
         font16(U"確定と同時に探索").draw(50+20+5, WINDOW_SIZE_H-60, Color(Palette::Black));
-        fieldData.setSolvingWithChangeTurn(solvingCheck.getStatus());
+        fieldData.setSolvingWithNextTurn(solvingCheck.getStatus());
         
         
         // 得点の描画

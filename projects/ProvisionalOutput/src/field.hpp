@@ -62,7 +62,7 @@ public:
     void drawArrow(const Vec2 argSquarePosition, const int argBeforeX, const int argBeforeY, const int argX, const int argY, const bool argIsTileRemoved);
     
     // タイル除去
-    void removeTile(const int argX, const int argY, const int argTileStatus);
+    void removeTile(const int argX, const int argY);
     
     // 領域を除去
     void removeArea(const int argX, const int argY, const int argRemoveTeam);
@@ -71,7 +71,7 @@ public:
     void putTile(const int argX, const int argY, const int argTileStatus);
     
     // エージェントの行動
-    int agentMovement(int argX, int argY, int argBeforeX, int argBeforeY);
+    int agentMovement(int argX, int argY, int argBeforeX, int argBeforeY, bool argRemoveTile);
     
     // 選択するエージェントの変更
     void setCurrentAgent(int argX, int argY);
@@ -86,7 +86,7 @@ public:
     void startSolving();
     
     // 自動探索（ターン切替時）
-    void setSolvingWithChangeTurn(bool argBool);
+    void setSolvingWithNextTurn(bool argBool);
     
 private:
     vector<vector<int>> mFieldPointsArray;              // フィールドの点数格納用
